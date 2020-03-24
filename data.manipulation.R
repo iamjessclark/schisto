@@ -10,6 +10,7 @@ require(tidyverse)
 
 #### Data ####
 
+#### 2004-2014 ####
 # michelle data
 # KK and CCA data 
 long.data.04to14 <- read_csv("Clean long data 2015-07-09.csv")
@@ -112,7 +113,10 @@ for(i in 2:length(unique.ID)){
   long.data <- rbind(long.data, unique.ID[[i]])
 }
 
-# Pre treatment data 
+long.data$Week <- as.factor(long.data$Week)
+
+
+#### Pre treatment data ####
 
 preT04to14 <- read_csv("Clean pre data 2015-08-27.csv")
 
@@ -191,109 +195,157 @@ for(i in 2:length(unique.ID.pre)){
 }
 
 
-# 2017/2018
+#### 2017/2018 ####
 # Just KK data 
 
 # Bugoto 
 # no.trts variable is number of treatments since baseline
 
 KK.bug.BLT <- read_csv("kk_bg_17_03_13_clean.csv") # march 2017
-KK.bug.BLT$time <- "baseline"
-KK.bug.BLT$wks.since.BL <- "zero"
-KK.bug.BLT$no.trts <- "One"
+KK.bug.BLT$time <- "Baseline"
+KK.bug.BLT$`Weeks Since Baseline` <- "Zero"
+KK.bug.BLT$`Number of Treatments` <- "One"
+KK.bug.BLT$`Weeks Since Treatment` <- "Zero"
+KK.bug.BLT$Year <- "2017"
 KK.bug.BLT <- KK.bug.BLT %>% rowwise() %>% mutate(mean.eps=mean(c(sm_a, sm_b), na.rm = T))
+KK.bug.BLT$School <- "Bugoto"
 #KK.bug.BLT$date <- as.Date(as.character(KK.bug.BLT$date), format = "%d/%m/%Y")
 #KK.bug.BLT$date.trt <- as.Date(as.character("20/10/2017"), format = "%d/%m/%Y")
 #KK.bug.BLT$days.since.trt <- difftime(KK.bug.BLT$date, KK.bug.BLT$date.trt, units = c("days"))
-kk.bug.bl <- KK.bug.BLT %>% select(cid, date, time, wks.since.BL, no.trts, mean.eps)
+kk.bug.bl <- KK.bug.BLT %>% select(cid,School, `Weeks Since Treatment`, Year, mean.eps)
+kk.bug.bl$event <- "Treated"
 
 KK.bug.6mT.2017 <- read_csv("kk_bg_17_09_25_clean.csv") # Sept 2017
-KK.bug.6mT.2017$time <- "6months2017"
-KK.bug.6mT.2017$wks.since.BL <- "Twenty-Eight"
-KK.bug.6mT.2017$no.trts <- "Two"
+KK.bug.6mT.2017$time <- "6 Months 2017"
+KK.bug.6mT.2017$`Weeks Since Baseline` <- "6 Months"
+KK.bug.6mT.2017$`Number of Treatments` <- "Two"
+KK.bug.6mT.2017$`Weeks Since Treatment` <- "Zero"
+KK.bug.6mT.2017$Year <- "2017"
+KK.bug.6mT.2017$School <- "Bugoto"
 KK.bug.6mT.2017 <- KK.bug.6mT.2017 %>% rowwise() %>% mutate(mean.eps=mean(c(sm_a, sm_b), na.rm = T))
 #KK.bug.6mT.2017$date <- as.Date(as.character(KK.bug.6mT.2017$date), format = "%d/%m/%Y")
 #KK.bug.6mT.2017$date.trt <- as.Date(as.character("06/10/2017"), format = "%d/%m/%Y")
 #KK.bug.6mT.2017$days.since.trt <- difftime(KK.bug.6mT.2017$date.trt,KK.bug.6mT.2017$date, units = c("days"))
-kk.bug.6mPostT <- KK.bug.6mT.2017 %>% select(cid, date, time, wks.since.BL, no.trts, mean.eps)
+kk.bug.6mPostT <- KK.bug.6mT.2017 %>% select(cid, School, `Weeks Since Treatment`, Year, mean.eps)
+kk.bug.6mPostT$event <- "Treated"
 
 KK.bug.6m3wk <- read_csv("kk_bg_17_10_25_clean.csv") # Oct 2017
-KK.bug.6m3wk$time <- "3weeks"
-KK.bug.6m3wk$wks.since.BL <- "Thirty-Two"
-KK.bug.6m3wk$no.trts <- "Two"
+KK.bug.6m3wk$time <- "3 Weeks"
+KK.bug.6m3wk$`Weeks Since Baseline` <- "6 months 3 Weeks"
+KK.bug.6m3wk$`Number of Treatments` <- "Two"
+KK.bug.6m3wk$`Weeks Since Treatment` <- "Three"
+KK.bug.6m3wk$Year <- "2017"
+KK.bug.6m3wk$School <- "Bugoto"
 KK.bug.6m3wk <- KK.bug.6m3wk %>% rowwise() %>% mutate(mean.eps=mean(c(sm_a, sm_b), na.rm = T))
-kk.bug.3wkpostT <- KK.bug.6m3wk %>% select(cid, date, time, wks.since.BL, no.trts, mean.eps)
+kk.bug.3wkpostT <- KK.bug.6m3wk %>% select(cid, School, `Weeks Since Treatment`, Year, mean.eps)
+kk.bug.3wkpostT$event <- "Check-up"
 
 KK.bug.6m9wk <- read_csv("kk_bg_17_12_04_clean.csv") # Dec 2017
-KK.bug.6m9wk$time <- "9weeks"
-KK.bug.6m9wk$wks.since.BL <- "Thirty-Eight"
-KK.bug.6m9wk$no.trts <- "Two"
+KK.bug.6m9wk$time <- "9 Weeks"
+KK.bug.6m9wk$`Weeks Since Baseline` <- "6 Months 9 Weeks"
+KK.bug.6m9wk$`Number of Treatments` <- "Two"
+KK.bug.6m9wk$`Weeks Since Treatment` <- "Three"
+KK.bug.6m9wk$Year <- "2017"
+KK.bug.6m9wk$School <- "Bugoto"
 KK.bug.6m9wk <- KK.bug.6m9wk %>% rowwise() %>% mutate(mean.eps=mean(c(sm_a, sm_b), na.rm = T))
-kk.bug.9wekpostT <- KK.bug.6m9wk %>% select(cid, date, time, wks.since.BL, no.trts, mean.eps)
+kk.bug.9wekpostT <- KK.bug.6m9wk %>% select(cid, School, `Weeks Since Treatment`, Year, mean.eps)
+kk.bug.9wekpostT$event <- "Check-up"
 
 KK.bug.6mT2018 <- read_csv("kk_bg_18_03_05_clean.csv") # Mar 2018
-KK.bug.6mT2018$time <- "6months2018"
-KK.bug.6mT2018$wks.since.BL <- "Fifty-one"
-KK.bug.6mT2018$no.trts <- "Three"
+KK.bug.6mT2018$time <- "6 Months 2018"
+KK.bug.6mT2018$`Weeks Since Baseline` <- "1 year"
+KK.bug.6mT2018$`Number of Treatments` <- "Three"
+KK.bug.6mT2018$`Weeks Since Treatment` <- "6 Months"
+KK.bug.6mT2018$Year <- "2018"
+KK.bug.6mT2018$School <- "Bugoto"
 KK.bug.6mT2018 <- KK.bug.6mT2018 %>% rowwise() %>% mutate(mean.eps=mean(c(sm_a, sm_b), na.rm = T))
-kk.bug.6mpT1ypBL <- KK.bug.6mT2018 %>% select(cid, date, time, wks.since.BL, no.trts, mean.eps)
+kk.bug.6mpT1ypBL <- KK.bug.6mT2018 %>% select(cid, School, `Weeks Since Treatment`, Year, mean.eps)
+kk.bug.6mpT1ypBL$event <- "Treated"
 
 KK.bug.6m3wk2018 <- read_csv("kk_bg_18_03_27_clean.csv") # Mar 2018
-KK.bug.6m3wk2018$time <- "3weeks2018"
-KK.bug.6m3wk2018$wks.since.BL <- "Fifty-four"
-KK.bug.6m3wk2018$no.trts <- "Three"
+KK.bug.6m3wk2018$time <- "3 Weeks 2018"
+KK.bug.6m3wk2018$`Weeks Since Baseline` <- "1 year 3 Weeks"
+KK.bug.6m3wk2018$`Number of Treatments` <- "Three"
+KK.bug.6m3wk2018$`Weeks Since Treatment` <- "Three"
+KK.bug.6m3wk2018$Year <- "2018"
+KK.bug.6m3wk2018$School <- "Bugoto"
 KK.bug.6m3wk2018$sm_b <- as.numeric(KK.bug.6m3wk2018$sm_b)
 KK.bug.6m3wk2018 <- KK.bug.6m3wk2018 %>% rowwise() %>% mutate(mean.eps=mean(c(sm_a, sm_b), na.rm = T))
-kk.bug.6m3wkpT1ypBL <- KK.bug.6m3wk2018 %>% select(cid, date, time, wks.since.BL, no.trts, mean.eps)
-
+kk.bug.6m3wkpT1ypBL <- KK.bug.6m3wk2018 %>% select(cid, School, `Weeks Since Treatment`, Year, mean.eps)
+kk.bug.6m3wkpT1ypBL$event <- "Check-up"
 # Bwondha 
 
 KK.bwo.BLT <- read_csv("kk_bwondha_2017.09.20_clean.csv") # Sept 2017
-KK.bwo.BLT$time <- "baseline"
-KK.bwo.BLT$wks.since.BL <- "zero"
-KK.bwo.BLT$no.trts <- "One"
+KK.bwo.BLT$time <- "Baseline"
+KK.bwo.BLT$`Weeks Since Baseline` <- "Zero"
+KK.bwo.BLT$`Number of Treatments` <- "One"
+KK.bwo.BLT$`Weeks Since Treatment` <- "Zero"
+KK.bwo.BLT$Year <- "2017"
+KK.bwo.BLT$School <- "Bwondha"
 KK.bwo.BLT <- KK.bwo.BLT %>% rowwise() %>% mutate(mean.eps=mean(c(sm_a, sm_b), na.rm = T))%>% rename(cid=cid_full)
-kk.bwo.bl <- KK.bwo.BLT %>% select(cid, date, time, wks.since.BL, no.trts, mean.eps)
+kk.bwo.bl <- KK.bwo.BLT %>% select(cid, School, `Weeks Since Treatment`, Year, mean.eps)
+kk.bwo.bl$event <- "Treated"
 
 KK.bwo.4mT <- read_csv("kk_bwondha_2018.02.21_clean.csv") # Feb 2018 6 monthsish
-KK.bwo.4mT$time <- "4months"
-KK.bwo.4mT$wks.since.BL <- "Twenty"
-KK.bwo.4mT$no.trts <- "Two"
+KK.bwo.4mT$time <- "4 Months"
+KK.bwo.4mT$`Weeks Since Baseline` <- "16 Weeks"
+KK.bwo.4mT$`Number of Treatments` <- "One"
+KK.bwo.4mT$`Weeks Since Treatment` <- "16 Weeks"
+KK.bwo.4mT$Year <- "2018"
+KK.bwo.4mT$School <- "Bwondha"
 KK.bwo.4mT <- KK.bwo.4mT %>% rowwise() %>% mutate(mean.eps=mean(c(sm_a, sm_b), na.rm = T))%>% rename(cid=cid_full)
-kk.bwo.4mpT <- KK.bwo.4mT %>% select(cid, date, time, wks.since.BL, no.trts, mean.eps)
+kk.bwo.4mt <- KK.bwo.4mT %>% select(cid, School, `Weeks Since Treatment`, Year, mean.eps)
+kk.bwo.4mt$event <- "Treated"
 
 KK.bwo.3wk <- read_csv("kk_bwondha_2018.03.14_clean.csv") # Mar 2018
-KK.bwo.3wk$time <- "3weeks2018"
-KK.bwo.3wk$wks.since.BL <- "Twenty-three"
-KK.bwo.3wk$no.trts <- "Two"
+KK.bwo.3wk$time <- "3 Weeks 2018"
+KK.bwo.3wk$`Weeks Since Baseline` <- "19 Weeks"
+KK.bwo.3wk$`Number of Treatments` <- "Two"
+KK.bwo.3wk$`Weeks Since Treatment` <- "3 Weeks"
+KK.bwo.3wk$Year <- "2018"
+KK.bwo.3wk$School <- "Bwondha"
 KK.bwo.3wk <- KK.bwo.3wk %>% rowwise() %>% mutate(mean.eps=mean(c(sm_a, sm_b), na.rm = T))%>% rename(cid=cid_full)
-kk.bwo.3wkpT <- KK.bwo.3wk %>% select(cid, date, time, wks.since.BL, no.trts, mean.eps)
+kk.bwo.3wkpT <- KK.bwo.3wk %>% select(cid, School, `Weeks Since Treatment`, Year, mean.eps)
+kk.bwo.3wkpT$event <- "Check-up"
 
 # Musubi 
 
 KK.mus.BLT <- read_csv("kk_musubi_2017.10.10_clean.csv") # Sep 2017
-KK.mus.BLT$time <- "baseline"
-KK.mus.BLT$wks.since.BL <- "Zero"
-KK.mus.BLT$no.trts <- "One"
+KK.mus.BLT$time <- "Baseline"
+KK.mus.BLT$`Weeks Since Baseline` <- "Zero"
+KK.mus.BLT$`Number of Treatments` <- "One"
+KK.mus.BLT$`Weeks Since Treatment` <- "Zero"
+KK.mus.BLT$Year <- "2017"
+KK.mus.BLT$School <- "Musubi"
 KK.mus.BLT <- KK.mus.BLT %>% rowwise() %>% mutate(mean.eps=mean(c(sm_a, sm_b), na.rm = T))%>% rename(cid=cid_full)
-kk.mus.bl <- KK.mus.BLT %>% select(cid, date, time, wks.since.BL, no.trts, mean.eps)
+kk.mus.bl <- KK.mus.BLT %>% select(cid, School, `Weeks Since Treatment`, Year, mean.eps)
+kk.mus.bl$event <- "Treated"
 
 KK.mus.6mT <- read_csv("kk_musubi_2018.02.28_clean.csv") # Feb/ March 2018 
-KK.mus.6mT$time <- "6months"
-KK.mus.6mT$wks.since.BL <- "Twenty-eight"
-KK.mus.6mT$no.trts <- "Two"
+KK.mus.6mT$time <- "6 Months"
+KK.mus.6mT$`Weeks Since Baseline` <- "28 Weeks"
+KK.mus.6mT$`Number of Treatments` <- "Two"
+KK.mus.6mT$`Weeks Since Treatment` <- "Zero"
+KK.mus.6mT$Year <- "2018"
+KK.mus.6mT$School <- "Musubi"
 KK.mus.6mT <- KK.mus.6mT %>% rowwise() %>% mutate(mean.eps=mean(c(sm_a, sm_b), na.rm = T))%>% rename(cid=cid_full)
-kk.mus.6mpT <- KK.mus.6mT %>% select(cid, date, time, wks.since.BL, no.trts, mean.eps)
+kk.mus.6mpT <- KK.mus.6mT %>% select(cid, School, `Weeks Since Treatment`, Year, mean.eps)
+kk.mus.6mpT$event <- "Treated"
 
 KK.mus.3wk <- read_csv("kk_musubi_2018.03.26_clean.csv") # Mar 2018
-KK.mus.3wk$time <- "3weeks2018"
-KK.mus.3wk$wks.since.BL <- "Thirty-one"
-KK.mus.3wk$no.trts <- "Two"
+KK.mus.3wk$time <- "3 Weeks 2018"
+KK.mus.3wk$`Weeks Since Baseline` <- "31 Weeks"
+KK.mus.3wk$`Number of Treatments` <- "Two"
+KK.mus.3wk$`Weeks Since Treatment` <- "Three"
+KK.mus.3wk$Year <- "2018"
+KK.mus.3wk$School <- "Musubi"
 KK.mus.3wk <- KK.mus.3wk %>% rowwise() %>% mutate(mean.eps=mean(c(sm_a, sm_b), na.rm = T))%>% rename(cid=cid_full)
-kk.mus.3wkpT <- KK.mus.3wk %>% select(cid, date, time, wks.since.BL, no.trts, mean.eps)
+kk.mus.3wkpT <- KK.mus.3wk %>% select(cid, School, `Weeks Since Treatment`, Year, mean.eps)
+kk.mus.3wkpT$event <- "Check-up"
 
-recent.data <- rbind(kk.bug.bl, kk.bug.6mPostT, kk.bug.3wkpostT, kk.bug.9wekpostT, kk.bug.6mpT1ypBL, kk.bug.6m3wkpT1ypBL, kk.bwo.bl, kk.bwo.4mpT, kk.bwo.3wkpT, kk.mus.bl, kk.mus.6mpT, kk.mus.3wkpT)
+recent.data <- rbind(kk.bug.bl, kk.bug.6mPostT, kk.bug.3wkpostT, kk.bug.9wekpostT, kk.bug.6mpT1ypBL, kk.bug.6m3wkpT1ypBL, kk.bwo.bl, kk.bwo.4mt, kk.bwo.3wkpT, kk.mus.bl,kk.mus.6mpT,kk.mus.3wkpT   )
 recent.data$mean.eps[is.nan(recent.data$mean.eps)] <- NA
-
-
-
+recent.data$event <- as.factor(recent.data$event)
+recent.data$School <- as.factor(recent.data$School)
+recent.data$`Weeks Since Treatment` <- as.factor(recent.data$`Weeks Since Treatment`)
+recent.data$Year <- as.factor(recent.data$Year)
