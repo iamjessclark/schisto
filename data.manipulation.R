@@ -177,7 +177,7 @@ KK.mus.BLT$time <- "baseline"
 KK.mus.BLT$wks.since.BL <- "Zero"
 KK.mus.BLT$no.trts <- "One"
 
-KK.mus.6mT <- read_csv("kk_musubi_2018.02.28_clean.csv") # Feb/ March 2018
+KK.mus.6mT <- read_csv("kk_musubi_2018.02.28_clean.csv") # Feb/ March 2018 
 KK.mus.6mT$time <- "6months"
 KK.mus.6mT$wks.since.BL <- "Twenty-eight"
 KK.mus.6mT$no.trts <- "Two"
@@ -189,3 +189,5 @@ KK.mus.3wk$no.trts <- "Two"
 
 recent.data <- rbind(KK.bug.BLT, KK.bug.6mT.2017, KK.bug.6m3wk, KK.bug.6mT2018, KK.bug.6m3wk2018, KK.bwo.BLT, KK.bwo.4mT, KK.bwo.3wk, KK.mus.BLT, KK.mus.6mT, KK.mus.3wk)
 # now you need to fix the different sized data frames 
+
+
