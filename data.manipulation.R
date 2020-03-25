@@ -115,7 +115,92 @@ for(i in 2:length(unique.ID)){
 
 long.data$Week <- as.factor(long.data$Week)
 
+long.data$Month <- NA
 
+for(i in 1:nrow(long.data)){
+  if(long.data[i,2]=="2004" & long.data[i,4]=="0"){
+    long.data[i,ncol(long.data)] <- "Baseline 2004"
+  } else if(long.data[i,2]=="2004" && long.data[i,4]=="1"){
+    long.data[i,ncol(long.data)] <- " July '04 1wk PT"
+  } else if(long.data[i,2]=="2004" && long.data[i,4]=="4"){
+    long.data[i,ncol(long.data)] <- "Aug 4wk PT"
+  } else if(long.data[i,2]=="2004" && long.data[i,4]=="26"){
+    long.data[i,ncol(long.data)] <- "Feb 2005"
+  } else if(long.data[i,2]=="2004" && long.data[i,4]=="27"){
+    long.data[i,ncol(long.data)] <- "Feb 6mth 1wk"
+  } else if(long.data[i,2]=="2005" && long.data[i,4]=="0"){
+    long.data[i,ncol(long.data)] <- "June 2005"
+  } else if(long.data[i,2]=="2005" && long.data[i,4]=="1"){
+    long.data[i,ncol(long.data)] <- "July 1wk PT"
+  } else if(long.data[i,2]=="2005" && long.data[i,4]=="4"){
+    long.data[i,ncol(long.data)] <- "July 4wk PT"
+  } else if(long.data[i,2]=="2006" && long.data[i,4]=="0"){
+    long.data[i,ncol(long.data)] <- "May 2006"
+  } else if(long.data[i,2]=="2006" && long.data[i,4]=="1"){
+    long.data[i,ncol(long.data)] <- "June 1wk PT"
+  } else if(long.data[i,2]=="2006" && long.data[i,4]=="4"){
+    long.data[i,ncol(long.data)] <- "July 4wk PT"
+  } else if(long.data[i,2]=="2013" && long.data[i,4]=="0"){
+    long.data[i,ncol(long.data)] <- "Feb 2013"
+  } else if(long.data[i,2]=="2013" && long.data[i,4]=="1"){
+    long.data[i,ncol(long.data)] <- "Feb 1wk PT"
+  } else if(long.data[i,2]=="2013" && long.data[i,4]=="4"){
+    long.data[i,ncol(long.data)] <- "March 3wk PT"
+  } else if(long.data[i,2]=="2014" && long.data[i,4]=="0"){
+    long.data[i,ncol(long.data)] <- "May 2014"
+  } else {
+    long.data[i,ncol(long.data)] <- "June 4wk PT"
+  }
+} 
+
+long.data$Month <- as.factor(long.data$Month)
+
+long.data$event <- NA
+
+for(i in 1:nrow(long.data)){
+  if(long.data[i,47]=="Baseline 2004"){
+    long.data[i,ncol(long.data)] <- "Treated"
+  } else if(long.data[i,47]=="July '04 1wk PT"){
+    long.data[i,ncol(long.data)] <- "Check-up"
+  } else if(long.data[i,47]=="Aug 4wk PT"){
+    long.data[i,ncol(long.data)] <- "Check-up"
+  } else if(long.data[i,47]=="Feb 2005"){
+    long.data[i,ncol(long.data)] <- "Check-up"
+  } else if(long.data[i,47]=="Feb 6mth 1wk"){
+    long.data[i,ncol(long.data)] <- "Check-up"
+  } else if(long.data[i,47]=="June 2005"){
+    long.data[i,ncol(long.data)] <- "Treated"
+  } else if(long.data[i,47]=="July 1wk PT"){
+    long.data[i,ncol(long.data)] <- "Check-up"
+  } else if(long.data[i,47]=="July 4wk PT"){
+    long.data[i,ncol(long.data)] <- "Check-up"
+  } else if(long.data[i,47]=="May 2006"){
+    long.data[i,ncol(long.data)] <- "Treated"
+  } else if(long.data[i,47]=="June 1wk PT"){
+    long.data[i,ncol(long.data)] <- "Check-up"
+  } else if(long.data[i,47]=="July 4wk PT"){
+    long.data[i,ncol(long.data)] <- "Check-up"
+  } else if(long.data[i,47]=="Feb 2013"){
+    long.data[i,ncol(long.data)] <- "Treated"
+  } else if(long.data[i,47]=="Feb 1wk PT"){
+    long.data[i,ncol(long.data)] <- "Check-up"
+  } else if(long.data[i,47]=="March 3wk PT"){
+    long.data[i,ncol(long.data)] <- "Check-up"
+  } else if(long.data[i,47]=="May 2014"){
+    long.data[i,ncol(long.data)] <- "Treated"
+  } else {
+    long.data[i,ncol(long.data)] <- "Check-up"
+  }
+} 
+
+long.data$event <- as.factor(long.data$event)
+
+long.data.plot <- long.data %>% select(cid_complete, Month, event, MeanSm, School)
+
+long.data.means <- long.data.plot %>% group_by(School, Month, event) %>%
+  summarise(`Mean Eggs Per Slide`=mean(MeanSm, na.rm = T), n=n(), sd=sd(MeanSm, na.rm=T), std.error=sd/sqrt(n))
+
+long.data.means$Month[which(is.na(long.data.means$Month))] <- "July '04 1wk PT"
 #### Pre treatment data ####
 
 preT04to14 <- read_csv("Clean pre data 2015-08-27.csv")
@@ -236,7 +321,7 @@ KK.bug.6m3wk$time <- "C"
 KK.bug.6m3wk$`Weeks Since Baseline` <- "6 months 3 Weeks"
 KK.bug.6m3wk$`Number of Treatments` <- "Two"
 KK.bug.6m3wk$`Weeks Since Treatment` <- "3 Weeks"
-KK.bug.6m3wk$Month <- "Oct 2017"
+KK.bug.6m3wk$Month <- "Oct 3wk PT"
 KK.bug.6m3wk$Year <- "2017"
 KK.bug.6m3wk$School <- "Bugoto"
 KK.bug.6m3wk <- KK.bug.6m3wk %>% rowwise() %>% mutate(mean.eps=mean(c(sm_a, sm_b), na.rm = T))
@@ -249,7 +334,7 @@ KK.bug.6m9wk$`Weeks Since Baseline` <- "6 Months 9 Weeks"
 KK.bug.6m9wk$`Number of Treatments` <- "Two"
 KK.bug.6m9wk$`Weeks Since Treatment` <- "9 Weeks"
 KK.bug.6m9wk$Year <- "2017"
-KK.bug.6m9wk$Month <- "Dec 2017"
+KK.bug.6m9wk$Month <- "Dec 9wk PT"
 KK.bug.6m9wk$School <- "Bugoto"
 KK.bug.6m9wk <- KK.bug.6m9wk %>% rowwise() %>% mutate(mean.eps=mean(c(sm_a, sm_b), na.rm = T))
 kk.bug.9wekpostT <- KK.bug.6m9wk %>% select(cid, time,  School, Month, `Weeks Since Treatment`, Year, mean.eps)
@@ -273,7 +358,7 @@ KK.bug.6m3wk2018$`Weeks Since Baseline` <- "1 year 3 Weeks"
 KK.bug.6m3wk2018$`Number of Treatments` <- "Three"
 KK.bug.6m3wk2018$`Weeks Since Treatment` <- "3 Weeks"
 KK.bug.6m3wk2018$Year <- "2018"
-KK.bug.6m3wk2018$Month <- "March wk 3"
+KK.bug.6m3wk2018$Month <- "March 3wk PT"
 KK.bug.6m3wk2018$School <- "Bugoto"
 KK.bug.6m3wk2018$sm_b <- as.numeric(KK.bug.6m3wk2018$sm_b)
 KK.bug.6m3wk2018 <- KK.bug.6m3wk2018 %>% rowwise() %>% mutate(mean.eps=mean(c(sm_a, sm_b), na.rm = T))
@@ -311,7 +396,7 @@ KK.bwo.3wk$`Weeks Since Baseline` <- "19 Weeks"
 KK.bwo.3wk$`Number of Treatments` <- "Two"
 KK.bwo.3wk$`Weeks Since Treatment` <- "3 Weeks"
 KK.bwo.3wk$Year <- "2018"
-KK.bwo.3wk$Month <- "March wk 3"
+KK.bwo.3wk$Month <- "March 3wk PT"
 KK.bwo.3wk$School <- "Bwondha"
 KK.bwo.3wk <- KK.bwo.3wk %>% rowwise() %>% mutate(mean.eps=mean(c(sm_a, sm_b), na.rm = T))%>% rename(cid=cid_full)
 kk.bwo.3wkpT <- KK.bwo.3wk %>% select(cid, time,  School, Month, `Weeks Since Treatment`, Year, mean.eps)
@@ -348,7 +433,7 @@ KK.mus.3wk$time <- "L"
 KK.mus.3wk$`Weeks Since Baseline` <- "31 Weeks"
 KK.mus.3wk$`Number of Treatments` <- "Two"
 KK.mus.3wk$`Weeks Since Treatment` <- "3 Weeks"
-KK.mus.3wk$Month <- "March wk 3"
+KK.mus.3wk$Month <- "March 3wk PT"
 KK.mus.3wk$Year <- "2018"
 KK.mus.3wk$School <- "Musubi"
 KK.mus.3wk <- KK.mus.3wk %>% rowwise() %>% mutate(mean.eps=mean(c(sm_a, sm_b), na.rm = T))%>% rename(cid=cid_full)
@@ -365,25 +450,37 @@ recent.data$Year <- as.factor(recent.data$Year)
 recent.data$Month <- as.factor(recent.data$Month)
 require(tidytext)
 
-
-recent.data.means <- recent.data %>% group_by(School,Month, `Weeks Since Treatment`, Year, time,  event) %>%
+recent.data.means <- recent.data %>% group_by(School, Month,  event) %>%
   summarise(`Mean Eggs Per Slide`=mean(mean.eps, na.rm = T), n=n(), sd=sd(mean.eps, na.rm=T), std.error=sd/sqrt(n))
 
+recent.data.means$Month <- as.character(recent.data.means$Month)
+recent.data.means$Month[which(is.na(recent.data.means$Month))] <- ("March 3wk PT")
+recent.data.means$Month <- as.factor(recent.data.means$Month)
 
 #### Plot of EPS over time ####
-recent.data$Month <- factor(recent.data$Month, levels = c("March 2017", "Sept 2017", "Oct 2017", "Dec 2017", "Feb 2018", "March 2018", "March wk 3"))
-levels(recent.data$Month)
+
+all.data.means <- as.data.frame(rbind(long.data.means, recent.data.means))
+all.data.means$Month <- factor(all.data.means$Month, levels = c("Baseline 2004", "July '04 1wk PT", "Aug 4wk PT", "Feb 2005", "Feb 6mth 1wk", "June 2005", "July 1wk PT", "May 2006", "June 1wk PT", "July 4wk PT", "Feb 2013", "Feb 1wk PT","March 3wk PT", "May 2014",  "June 4wk PT" ,"March 2017", "Sept 2017", "Oct 3wk PT", "Dec 9wk PT", "Feb 2018", "March 2018", "March 3 wk PT" ))
+all.data.means$School <- as.factor(all.data.means$School)
+all.data.means$Month <- as.factor(all.data.means$Month)
+
+levels(all.data.means$Month)
+
 theme_set(theme_classic())
 
-plot <- ggplot(recent.data.means, aes(x = Month, y = `Mean Eggs Per Slide`, group = School, colour=School, shape=event)) + 
+
+plot <- ggplot(all.data.means, aes(x = Month, y = `Mean Eggs Per Slide`, group = School, colour=School, shape=event)) + 
   geom_point(size = 3) + 
-  geom_line()+
-  geom_errorbar(data = recent.data.means, aes(ymin=`Mean Eggs Per Slide`- std.error, ymax=`Mean Eggs Per Slide`+std.error), width=.2)+
+  geom_line(lty=2)+
+  geom_errorbar(data = all.data.means, aes(ymin=`Mean Eggs Per Slide`- std.error, ymax=`Mean Eggs Per Slide`+std.error), width=.2)+
   xlab("Sampling Period")+
   #facet_grid(. ~ Year, switch="x", scales = "free_x") +
   theme(strip.placement="outside",
         strip.background=element_rect(colour=NA),
         panel.spacing.x=unit(0,"lines"),
-        panel.border=element_rect(colour="grey50", fill=NA))
+        panel.border=element_rect(colour="grey50", fill=NA),
+        axis.text.x = element_text(angle = 90))
 
 plot
+
+
