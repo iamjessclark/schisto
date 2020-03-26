@@ -13,13 +13,195 @@ require(lubridate)
 #### 2004-2014 ####
 # michelle data
 # KK and CCA data 
-      m
+long.data.04to14 <- read_csv("Clean long data 2015-07-09.csv")
+
+# need to make a unique childs ID for each combination of school and age group
+
+long.data.04to14$cid <- NA
+long.data.04to14$AgeAtRecruit <- as.factor(long.data.04to14$AgeAtRecruit)
+levels(long.data.04to14$AgeAtRecruit)[levels(long.data.04to14$AgeAtRecruit)=="6"] <- "06"
+levels(long.data.04to14$AgeAtRecruit)[levels(long.data.04to14$AgeAtRecruit)=="7"] <- "07"
+levels(long.data.04to14$AgeAtRecruit)[levels(long.data.04to14$AgeAtRecruit)=="8"] <- "08"
+levels(long.data.04to14$AgeAtRecruit)[levels(long.data.04to14$AgeAtRecruit)=="9"] <- "09"
+long.data.04to14$AgeAtRecruit <- as.character(long.data.04to14$AgeAtRecruit)
+
+long.data.04to14$AGE <- as.factor(long.data.04to14$AGE)
+levels(long.data.04to14$AGE)[levels(long.data.04to14$AGE)=="6"] <- "06"
+levels(long.data.04to14$AGE)[levels(long.data.04to14$AGE)=="7"] <- "07"
+levels(long.data.04to14$AGE)[levels(long.data.04to14$AGE)=="8"] <- "08"
+levels(long.data.04to14$AGE)[levels(long.data.04to14$AGE)=="9"] <- "09"
+long.data.04to14$AGE <- as.character(long.data.04to14$AGE)
+
+#gen.uniqueID <- long.data.04to14 %>% 
+#  group_by(School, AgeAtRecruit, RecruitYr) %>%
+#  summarise(count=n())
+#gen.uniqueID$yor <- NA
+#for(i in 1:nrow(gen.uniqueID)){
+# if(gen.uniqueID[i,3]=="2003"){
+#  gen.uniqueID[i,ncol(gen.uniqueID)] <- "03"
+#} else if(gen.uniqueID[i,3]=="2004"){
+# gen.uniqueID[i,ncol(gen.uniqueID)] <- "04"
+#} else if(gen.uniqueID[i,3]=="2005"){
+# gen.uniqueID[i,ncol(gen.uniqueID)] <- "05"
+#} else if(gen.uniqueID[i,3]=="2006"){
+# gen.uniqueID[i,ncol(gen.uniqueID)] <- "06"
+#} else if(gen.uniqueID[i,3]=="2013"){
+# gen.uniqueID[i,ncol(gen.uniqueID)] <- "13"
+#} else {
+#gen.uniqueID[i,ncol(gen.uniqueID)] <- "14"
+#}
+#}
+
+#gen.uniqueID$yor <- as.factor(gen.uniqueID$yor)
+
+long.data.04to14$schoolID <- NA
+
+for(r in 1:nrow(long.data.04to14)){
+  if(long.data.04to14[r,1]=="Bugoto"){
+    long.data.04to14[r,ncol(long.data.04to14)] <- "BUG"
+  } else if(long.data.04to14[r,1]=="Bwondha"){
+    long.data.04to14[r, ncol(long.data.04to14)] <- "BWO"
+  } else {
+    long.data.04to14[r,ncol(long.data.04to14)] <- "MUS"
+  }
+}
+
+long.data.04to14$shortYOR <- NA
+
+for(r in 1:nrow(long.data.04to14)){
+  if(long.data.04to14[r,12]=="2003"){
+    long.data.04to14[r,ncol(long.data.04to14)] <- "03"
+  } else if(long.data.04to14[r,12]=="2004"){
+    long.data.04to14[r,ncol(long.data.04to14)] <- "04"
+  } else if(long.data.04to14[r,12]=="2005"){
+    long.data.04to14[r,ncol(long.data.04to14)] <- "05"
+  } else if(long.data.04to14[r,12]=="2006"){
+    long.data.04to14[r,ncol(long.data.04to14)] <- "06"
+  } else if(long.data.04to14[r,12]=="2013"){
+    long.data.04to14[r,ncol(long.data.04to14)] <- "13"
+  } else {
+    long.data.04to14[r,ncol(long.data.04to14)] <- "14"
+  }
+}
+
+long.data.04to14$shortYOR <- as.factor(long.data.04to14$shortYOR)
+
+long.data.04to14$cid <- as.factor(paste(long.data.04to14$schoolID, long.data.04to14$shortYOR, long.data.04to14$AGE, sep=""))
+
+unique.ID <- long.data.04to14 %>% group_split(cid)
+
+for(i in 1:length(unique.ID)){
+  df <- unique.ID[[i]]
+  df <- df %>% mutate(child.no=row_number())
+  df$child.no <- as.factor(df$child.no)
+  levels(df$child.no)[levels(df$child.no)=="1"] <- "01"
+  levels(df$child.no)[levels(df$child.no)=="2"] <- "02"
+  levels(df$child.no)[levels(df$child.no)=="3"] <- "03"
+  levels(df$child.no)[levels(df$child.no)=="4"] <- "04"
+  levels(df$child.no)[levels(df$child.no)=="5"] <- "05"
+  levels(df$child.no)[levels(df$child.no)=="6"] <- "06"
+  levels(df$child.no)[levels(df$child.no)=="7"] <- "07"
+  levels(df$child.no)[levels(df$child.no)=="8"] <- "08"
+  levels(df$child.no)[levels(df$child.no)=="9"] <- "09"
+  df$cid_complete <- as.factor(paste(df$cid, df$child.no, sep=""))
+  unique.ID[[i]] <- df
+}
+
+# this is the long data that has been a list now as a data frame again
+long.data <- unique.ID[[1]]
+for(i in 2:length(unique.ID)){
+  long.data <- rbind(long.data, unique.ID[[i]])
+}
+
+long.data$Week <- as.factor(long.data$Week)
+
+long.data$Month <- NA
+
+for(i in 1:nrow(long.data)){
+  if(long.data[i,2]=="2004" & long.data[i,4]=="0"){
+    long.data[i,ncol(long.data)] <- "Baseline 2004"
+  } else if(long.data[i,2]=="2004" && long.data[i,4]=="1"){
+    long.data[i,ncol(long.data)] <- "July 04 1wk PT"
+  } else if(long.data[i,2]=="2004" && long.data[i,4]=="4"){
+    long.data[i,ncol(long.data)] <- "Aug 4wk PT"
+  } else if(long.data[i,2]=="2004" && long.data[i,4]=="26"){
+    long.data[i,ncol(long.data)] <- "Feb 2005"
+  } else if(long.data[i,2]=="2004" && long.data[i,4]=="27"){
+    long.data[i,ncol(long.data)] <- "Feb 6mth 1wk"
+  } else if(long.data[i,2]=="2005" && long.data[i,4]=="0"){
+    long.data[i,ncol(long.data)] <- "June 2005"
+  } else if(long.data[i,2]=="2005" && long.data[i,4]=="1"){
+    long.data[i,ncol(long.data)] <- "July 1wk PT"
+  } else if(long.data[i,2]=="2005" && long.data[i,4]=="4"){
+    long.data[i,ncol(long.data)] <- "July 4wk PT"
+  } else if(long.data[i,2]=="2006" && long.data[i,4]=="0"){
+    long.data[i,ncol(long.data)] <- "May 2006"
+  } else if(long.data[i,2]=="2006" && long.data[i,4]=="1"){
+    long.data[i,ncol(long.data)] <- "June 1wk PT"
+  } else if(long.data[i,2]=="2006" && long.data[i,4]=="4"){
+    long.data[i,ncol(long.data)] <- "July 4wk PT"
+  } else if(long.data[i,2]=="2013" && long.data[i,4]=="0"){
+    long.data[i,ncol(long.data)] <- "Feb 2013"
+  } else if(long.data[i,2]=="2013" && long.data[i,4]=="1"){
+    long.data[i,ncol(long.data)] <- "Feb 1wk PT"
+  } else if(long.data[i,2]=="2013" && long.data[i,4]=="4"){
+    long.data[i,ncol(long.data)] <- "March 3wk PT"
+  } else if(long.data[i,2]=="2014" && long.data[i,4]=="0"){
+    long.data[i,ncol(long.data)] <- "May 2014"
+  } else {
+    long.data[i,ncol(long.data)] <- "June 4wk PT"
+  }
+} 
+
+long.data$Month <- as.factor(long.data$Month)
+
+long.data$event <- NA
+
+for(i in 1:nrow(long.data)){
+  if(long.data[i,47]=="Baseline 2004"){
+    long.data[i,ncol(long.data)] <- "Treated"
+  } else if(long.data[i,47]=="July 04 1wk PT"){
+    long.data[i,ncol(long.data)] <- "Check-up"
+  } else if(long.data[i,47]=="Aug 4wk PT"){
+    long.data[i,ncol(long.data)] <- "Check-up"
+  } else if(long.data[i,47]=="Feb 2005"){
+    long.data[i,ncol(long.data)] <- "Check-up"
+  } else if(long.data[i,47]=="Feb 6mth 1wk"){
+    long.data[i,ncol(long.data)] <- "Check-up"
+  } else if(long.data[i,47]=="June 2005"){
+    long.data[i,ncol(long.data)] <- "Treated"
+  } else if(long.data[i,47]=="July 1wk PT"){
+    long.data[i,ncol(long.data)] <- "Check-up"
+  } else if(long.data[i,47]=="July 4wk PT"){
+    long.data[i,ncol(long.data)] <- "Check-up"
+  } else if(long.data[i,47]=="May 2006"){
+    long.data[i,ncol(long.data)] <- "Treated"
+  } else if(long.data[i,47]=="June 1wk PT"){
+    long.data[i,ncol(long.data)] <- "Check-up"
+  } else if(long.data[i,47]=="July 4wk PT"){
+    long.data[i,ncol(long.data)] <- "Check-up"
+  } else if(long.data[i,47]=="Feb 2013"){
+    long.data[i,ncol(long.data)] <- "Treated"
+  } else if(long.data[i,47]=="Feb 1wk PT"){
+    long.data[i,ncol(long.data)] <- "Check-up"
+  } else if(long.data[i,47]=="March 3wk PT"){
+    long.data[i,ncol(long.data)] <- "Check-up"
+  } else if(long.data[i,47]=="May 2014"){
+    long.data[i,ncol(long.data)] <- "Treated"
+  } else {
+    long.data[i,ncol(long.data)] <- "Check-up"
+  }
+} 
+
+long.data$event <- as.factor(long.data$event)
+
+long.data.plot <- long.data %>% select(cid_complete, Month, event, MeanSm, School)
+
 long.data.means <- long.data.plot %>% group_by(School, Month, event) %>%
   summarise(`Mean Eggs Per Slide`=mean(MeanSm, na.rm = T), n=n(), sd=sd(MeanSm, na.rm=T), std.error=sd/sqrt(n))
 
-#long.data.means$Month[which(is.na(long.data.means$Month))] <- "July '04 1wk PT"
+long.data.means$Month[which(is.na(long.data.means$Month))] <- "July '04 1wk PT"
 #### Pre treatment data ####
-
 preT04to14 <- read_csv("Clean pre data 2015-08-27.csv")
 
 preT04to14$cid <- NA
@@ -175,7 +357,7 @@ KK.bug.6m3wk2018$`Weeks Since Baseline` <- "1 year 3 Weeks"
 KK.bug.6m3wk2018$`Number of Treatments` <- "Three"
 KK.bug.6m3wk2018$`Weeks Since Treatment` <- "3 Weeks"
 KK.bug.6m3wk2018$Year <- "2018"
-KK.bug.6m3wk2018$Month <- "March 3wk PT"
+KK.bug.6m3wk2018$Month <- "March 2018 3wk PT"
 KK.bug.6m3wk2018$School <- "Bugoto"
 KK.bug.6m3wk2018$sm_b <- as.numeric(KK.bug.6m3wk2018$sm_b)
 KK.bug.6m3wk2018 <- KK.bug.6m3wk2018 %>% rowwise() %>% mutate(mean.eps=mean(c(sm_a, sm_b), na.rm = T))
@@ -213,7 +395,7 @@ KK.bwo.3wk$`Weeks Since Baseline` <- "19 Weeks"
 KK.bwo.3wk$`Number of Treatments` <- "Two"
 KK.bwo.3wk$`Weeks Since Treatment` <- "3 Weeks"
 KK.bwo.3wk$Year <- "2018"
-KK.bwo.3wk$Month <- "March 3wk PT"
+KK.bwo.3wk$Month <- "March 2018 3wk PT"
 KK.bwo.3wk$School <- "Bwondha"
 KK.bwo.3wk <- KK.bwo.3wk %>% rowwise() %>% mutate(mean.eps=mean(c(sm_a, sm_b), na.rm = T))%>% rename(cid=cid_full)
 kk.bwo.3wkpT <- KK.bwo.3wk %>% select(cid, time,  School, Month, `Weeks Since Treatment`, Year, mean.eps)
@@ -250,7 +432,7 @@ KK.mus.3wk$time <- "L"
 KK.mus.3wk$`Weeks Since Baseline` <- "31 Weeks"
 KK.mus.3wk$`Number of Treatments` <- "Two"
 KK.mus.3wk$`Weeks Since Treatment` <- "3 Weeks"
-KK.mus.3wk$Month <- "March 3wk PT"
+KK.mus.3wk$Month <- "March 2018 3wk PT"
 KK.mus.3wk$Year <- "2018"
 KK.mus.3wk$School <- "Musubi"
 KK.mus.3wk <- KK.mus.3wk %>% rowwise() %>% mutate(mean.eps=mean(c(sm_a, sm_b), na.rm = T))%>% rename(cid=cid_full)
@@ -271,7 +453,7 @@ recent.data.means <- recent.data %>% group_by(cid, School, Month,  event) %>% su
   summarise(`Mean Eggs Per Slide`=mean(mean.eps, na.rm = T), n=n(), sd=sd(mean.eps, na.rm=T), std.error=sd/sqrt(n))
 
 recent.data.means$Month <- as.character(recent.data.means$Month)
-recent.data.means$Month[which(is.na(recent.data.means$Month))] <- ("March 3wk PT")
+recent.data.means$Month[which(is.na(recent.data.means$Month))] <- ("March 2018 3wk PT")
 recent.data.means$Month <- as.factor(recent.data.means$Month)
 
 #### Plot of EPS over time ####
@@ -281,7 +463,7 @@ all.data.means$Month <- factor(all.data.means$Month, levels = c("Baseline 2004",
                                                                 "Feb 6mth 1wk", "June 2005", "July 1wk PT", "May 2006", "June 1wk PT", 
                                                                 "July 4wk PT", "Feb 2013", "Feb 1wk PT","March 3wk PT", "May 2014",  
                                                                 "June 4wk PT" ,"March 2017", "Sept 2017", "Oct 3wk PT", "Dec 9wk PT", 
-                                                                "Feb 2018", "March 2018", "March 3 wk PT" ))
+                                                                "Feb 2018", "March 2018", "March 2018 3wk PT" ))
 all.data.means$School <- as.factor(all.data.means$School)
 all.data.means$Month <- as.factor(all.data.means$Month)
 
@@ -344,7 +526,7 @@ prevalence.all.data <- rbind(long.data.prev, recent.data.prev)
 prevalence.all.data$Month <- factor(prevalence.all.data$Month, levels = c("Baseline 2004", "July 04 1wk PT", "Aug 4wk PT", "Feb 2005", "Feb 6mth 1wk", 
                                                                           "June 2005", "July 1wk PT", "May 2006", "June 1wk PT", "July 4wk PT", "Feb 2013", 
                                                                           "Feb 1wk PT","March 3wk PT", "May 2014",  "June 4wk PT" ,"March 2017", "Sept 2017", 
-                                                                          "Oct 3wk PT", "Dec 9wk PT", "Feb 2018", "March 2018", "March 3 wk PT" ))
+                                                                          "Oct 3wk PT", "Dec 9wk PT", "Feb 2018", "March 2018", "March 2018 3wk PT" ))
 prevalence.all.data %>%
   count(Month, School, event, Prevalence) %>% 
   group_by(Month) %>% 
@@ -355,7 +537,7 @@ prevalence.all.data %>%
   #geom_point(size=3)+
   #geom_line()+
   theme(axis.text.x = element_text(angle=90))+
-  facet_grid(~School)+
+  facet_grid(~School, scales = "free_x")+
   ggsave("prevalence.pdf")
 
 #### Egg Reduction Rate ####
