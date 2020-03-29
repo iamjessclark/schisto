@@ -7,7 +7,6 @@
 #### Packages ####
 
 require(tidyverse)
-require(lubridate)
 #### Data ####
 
 #### 2004-2014 ####
@@ -200,7 +199,7 @@ long.data.plot <- long.data %>% select(cid_complete, Month, event, MeanSm, Schoo
 long.data.means <- long.data.plot %>% group_by(School, Month, event) %>%
   summarise(`Mean Eggs Per Slide`=mean(MeanSm, na.rm = T), n=n(), sd=sd(MeanSm, na.rm=T), std.error=sd/sqrt(n))
 
-long.data.means$Month[which(is.na(long.data.means$Month))] <- "July '04 1wk PT"
+long.data.means$Month[which(is.na(long.data.means$Month))] <- "July 04 1wk PT"
 #### Pre treatment data ####
 preT04to14 <- read_csv("Clean pre data 2015-08-27.csv")
 
