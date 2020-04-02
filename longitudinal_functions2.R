@@ -205,7 +205,7 @@ recent_data <- function(KK.bug.BLT, KK.bug.6mT.2017, KK.bug.6m3wk, KK.bug.6m9wk,
   KK.bwo.3wk$`Number of Treatments` <- "Two"
   KK.bwo.3wk$`Weeks Since Treatment` <- "3 Weeks"
   KK.bwo.3wk$Year <- "2018"
-  KK.bwo.3wk$Month <- "March 2018 3wk PT"
+  KK.bwo.3wk$Month <- "March 2018"
   KK.bwo.3wk$School <- "Bwondha"
   KK.bwo.3wk <- KK.bwo.3wk %>% rowwise() %>% mutate(mean.eps=mean(c(sm_a, sm_b), na.rm = T))%>% rename(cid=cid_full)
   kk.bwo.3wkpT <- KK.bwo.3wk %>% select(cid, time,  School, Month, `Weeks Since Treatment`, Year, mean.eps)
@@ -261,11 +261,24 @@ recent_data <- function(KK.bug.BLT, KK.bug.6mT.2017, KK.bug.6m3wk, KK.bug.6m9wk,
 
 #### egg reduction rate longitudinal data ####
 
+school_relabel <- function(dataframe){
+  dataframe$School <- NA
+  dataframe$School[grepl("MAYBUG",dataframe$cid)] <- "Bugoto"
+  dataframe$School[grepl("BG",dataframe$cid)] <- "Bugoto"
+  dataframe$School[grepl("MAYBWA",dataframe$cid)] <- "Bwondha"
+  dataframe$School[grepl("BW",dataframe$cid)] <- "Bwondha"
+  dataframe$School[grepl("MU",dataframe$cid)] <- "Musubi"
+  dataframe$School <- as.factor(dataframe$School)
+  return(dataframe)
+}
 
 
+#### Percent Change function ####
 
-
-
+percent.change <- function(new,old){
+  value <- ((new-old)/old)*100
+  return(value)
+}
 
 
 
