@@ -46,6 +46,8 @@ for(i in 1:nrow(baseline_2004)){
 }
 
 baseline_2004$prevalence <- as.factor(baseline_2004$prevalence)
+baseline_2004 <- baseline_2004 %>% filter(Week!="1",Week!="4",Week!="26",Week!="27")
+
 #### Modelling baseline prevalence and infection intensity ####
 
 # According to jarrod's notes there are two types of models you can run here
@@ -54,13 +56,11 @@ baseline_2004$prevalence <- as.factor(baseline_2004$prevalence)
 # A NB model w/o a RE should be a similar output but I am not sure it is entirely correct 
 # if the residual deviance is not so large in comparison to a small resid DF then it is not so od.
 # trying poisson + RE, NB and NB + RE
+baseline_2004 <- bl_data[-which(is.na(baseline_2004$MeanSm)==T),]
+baseline_2004$MeanSm <- as.numeric(baseline_2004$MeanSm)
 
-bl_data <- baseline_2004
-bl_data <- bl_data[-which(is.na(bl_data$MeanSm)==T),]
-bl_data$MeanSm <- as.numeric(bl_data$MeanSm)
-
-bl_int_dist_pois <- fitdist(bl_data$MeanSm, "pois", method="mle")
-bl_int_dist_nb <- fitdist(bl_data$MeanSm, "nbinom")
+bl_int_dist_pois <- fitdist(baseline_2004$MeanSm, "pois", method="mle")
+bl_int_dist_nb <- fitdist(baseline_2004$MeanSm, "nbinom")
 
 cdfcomp(list(bl_int_dist_nb, bl_int_dist_pois), xlogscale = FALSE, ylogscale = FALSE, legendtext = c("Negative Binomial", "Poisson"))
 
@@ -114,7 +114,9 @@ sim_plot_int_nb <- ggplot(data=bl_sim_nb) +
   geom_point(aes(y=mean_eggs, x=School), colour="red", size=4)+
   geom_errorbar(aes(x=School, ymin=mean_eggs- std_error_data, ymax=mean_eggs+std_error_data),colour="#2F4858", width=.2)+
   geom_errorbar(aes(x=School, ymin=mean_eggs_sim- std_error_sim, ymax=mean_eggs_sim+std_error_sim),colour="#2F4858", width=.2)+
-  theme(axis.text.x = element_text(angle=90))+
+  theme(axis.text.x = element_text(angle=90),
+        axis.text = element_text(size=14),
+        axis.title = element_text(size=14))+
   facet_grid(~School, scales = "free_x")+
   ylab("Mean Eggs Per Slide")+ xlab("School")+
   ggsave("nb model fit.pdf")
@@ -134,6 +136,7 @@ bl_int_sim_nbre$simulated <- simulate(bl_int_nbre, seed=1, newdata=bl_int_sim_nb
 
 
 no.zeros.nbre <- sum(bl_int_sim_nbre$simulated<1)
+
 
 bl_sim_nbre <- bl_int_sim_nbre %>% group_by(School) %>%
   summarise(mean_eggs=mean(MeanSm, na.rm = T), n=n(), sd_data=sd(MeanSm, na.rm=T), std_error_data=sd_data/sqrt(n), 
@@ -158,25 +161,27 @@ check_convergence(bl_int_nbre) # convergence is fine
 
 #### Infection prevalence baseline 2004 ####
 
-prev_2004 <- glmer(prevalence ~ School + (1|CID), data=baseline_2004, family=binomial(link='logit'))
+prev_2004 <- glmer(prevalence ~ relevel(School, ref="Bwondha") + (1|CID), data=baseline_2004, family=binomial(link='logit'))
 
 summary(prev_2004)
 
-baseline_2004%>% 
-  count(School, prevalence) %>% 
-  group_by(School) %>% 
-  mutate(sum=sum(n)) %>% 
-  mutate(proportion = n/sum) %>% 
-  ggplot(aes(y=proportion, x=School)) +
-  geom_col(position = "dodge", colour="#2F4858", fill="#F6AE2D")+
-  theme(axis.text.x = element_text(angle=360))+
+baseline_2004 %>%
+  group_by(School, Month, prevalence) %>%
+  summarise(n = n()) %>%
+  mutate(freq = n / sum(n))%>%
+  filter(prevalence=="1")%>%
+  ggplot(aes(x=Month, y=freq))+
+  geom_col(position = "dodge", fill="#F6AE2D", colour="#2F4858")+
+  theme(axis.text.x = element_text(angle=360),
+        axis.text = element_text(size=14),
+        axis.title = element_text(size=14))+
+  facet_grid(~School, scales = "free_x")+
   ylab("Infection Prevalence")+
-  scale_y_continuous(expand = c(0,0), limits = c(0,1))+
-  ggsave("prevalence_pzq_naive_2004.pdf")
+  ggsave("prev_naive_all_ages.pdf")
 
 #### Baseline age/ intensity distribution ####
 
-# can't fit a model to this data, I think the dataset is too small            
+# can't fit a model with obs level RE to this data, I think the dataset is too small            
 
 errorbars <- baseline_2004 %>% group_by(School) %>%
   summarise(mean_eggs=mean(MeanSm, na.rm = T), n=n(), sd_data=sd(MeanSm, na.rm=T), std_error_data=sd_data/sqrt(n))
@@ -190,6 +195,9 @@ int_age_2004 <- ggplot()+
     scale_color_brewer(palette = "Dark2")+
     scale_size_continuous(range = c(3, 10))+
     scale_y_continuous(breaks=seq(0,3000,500), limits=c(0, 3000))+
+  theme(axis.text.x = element_text(angle=360),
+        axis.text = element_text(size=14),
+        axis.title = element_text(size=14))+
   ggsave("age_split_baseline_int.pdf")
 
 # no effect of age in baseline data on infection prevalence in musubi #
@@ -197,12 +205,10 @@ int_age_2004 <- ggplot()+
 musubi_baseline <- baseline_2004 %>% filter(School=="Musubi")
 musubi_baseline$AGE <- as.factor(musubi_baseline$AGE)
 
-age_mus_bl <- glmer(prevalence ~ relevel(AGE, ref="12") + (1|CID), data=musubi_baseline, family=binomial(link='logit'))
+age_mus_bl <- glm(prevalence ~ relevel(AGE, ref="12"), data=musubi_baseline, family=binomial(link='logit'))
 summary(age_mus_bl)
 
 #### long data pzq naive 6 year olds ####
-
-# do the same analysis with just the six yearolds 
 
 pzq_naive_6yo <- long_data %>% filter(AgeAtRecruit =="06" & RecruitYr !="2003" & Week == "0" & AGE == "06") %>%
   select(CID, School, Month, event, MeanSm)
@@ -220,8 +226,11 @@ for(r in 1:nrow(pzq_naive_6yo)){
 }
 
 pzq_naive_6yo$prevalence <- as.factor(pzq_naive_6yo$prevalence)
-pzq_naive_6yo <- pzq_naive_6yo %>% rename(`mean eggs per slide`= MeanSm)%>% rename(cid=CID)
+#pzq_naive_6yo <- pzq_naive_6yo %>% rename(`mean eggs per slide`= MeanSm)%>% rename(cid=CID)
 
+musubi_add <- musubi_baseline %>% select(CID, School, Month, event, MeanSm, prevalence)
+
+pzq_naive_04allages <- bind_rows(musubi_add, pzq_naive_6yo)
 # 2017 - 2018 #
 
 KK.bug.BLT <- read_csv("kk_bg_17_03_13_clean.csv") # march 2017
@@ -264,65 +273,21 @@ pzq_naive_17_18$`mean eggs per slide` <- as.integer(pzq_naive_17_18$`mean eggs p
 
 #### Full pzq naive 6 yearolds ####
 
-pzq_naive_full <- bind_rows(pzq_naive_6yo, pzq_naive_17_18) 
-pzq_naive_full$Month <- factor(pzq_naive_full$Month, levels = c("Baseline 2004", "June 2005", "May 2006", "Feb 2013", 
-                                                                "May 2014", "March 2017", "Sept 2017", 
-                                                                "Feb 2018", "March 2018" ))
+#pzq_naive_full <- bind_rows(pzq_naive_6yo, pzq_naive_17_18) 
+#pzq_naive_full$Month <- factor(pzq_naive_full$Month, levels = c("Baseline 2004", "June 2005", "May 2006", "Feb 2013", 
+                                                                #"May 2014", "March 2017", "Sept 2017", 
+                                                                #"Feb 2018", "March 2018" ))
 
 #### data with all ages for musubi in 2004 #### 
-musubi04 <- musubi_baseline %>% filter(Week=="0") %>% 
-  select(CID, School, Month, event, MeanSm)%>%
-  rename(cid="CID", `mean eggs per slide`="MeanSm") 
-musubi04$prevalence <- NA
-for(i in 1:nrow(musubi04)){
-  if(musubi04[i,5]>0){
-    musubi04[i,ncol(musubi04)] <- 1
-  } else{
-    musubi04[i,ncol(musubi04)] <- 0
-  }
-}
-musubi04$prevalence <- as.factor(musubi04$prevalence)
+pzq_naive_17_18 <- pzq_naive_17_18 %>% rename(CID="cid", MeanSm=`mean eggs per slide`)
 
-pzq_naive <- bind_rows(musubi04, pzq_naive_6yo)
-
-pzq_naive_all <- bind_rows(pzq_naive, pzq_naive_17_18)
+pzq_naive_all <- bind_rows(pzq_naive_04allages, pzq_naive_17_18)
 pzq_naive_all <- pzq_naive_all %>% mutate_if(is.character, as.factor)
 pzq_naive_all$Month <- factor(pzq_naive_all$Month, levels = c("Baseline 2004", "June 2005", "May 2006", "Feb 2013", 
                                                                 "May 2014", "March 2017", "Sept 2017"))
 #### Across years ####
 
 #### Figures ####
-
-# infection prevalence plot #
-# DONT TRUST THESE TWO FIGURES!!!!!!!! #
-pzq_naive_full%>% 
-  mutate_if(is.character, as.factor)%>%
-  count(Month, School, prevalence) %>% 
-  group_by(Month) %>% 
-  mutate(sum=sum(n)) %>% 
-  mutate(proportion = n/sum) %>% 
-  ggplot(aes(y=proportion, x=Month, fill=School)) +
-  geom_col(position = "dodge", fill="#F6AE2D")+
-  theme(axis.text.x = element_text(angle=90))+
-  facet_grid(~School, scales = "free_x")+
-  ylab("Infection Prevalence")+
-  ggsave("prevalence_pzq_naive_6yo.pdf")
-
-
-# Infection intensity plot #
-
-pzq.errorbars <- pzq_naive_full %>% group_by(School, Month) %>%
-  summarise(mean_eggs=mean(`mean eggs per slide`, na.rm = T), n=n(), sd=sd(`mean eggs per slide`, na.rm=T), std.error=sd/sqrt(n))
-
-pzq.errorbars%>% 
-  ggplot(aes(y=mean_eggs, x=Month, group=School)) +
-  geom_point(colour="#F6AE2D", size=4)+
-  geom_line(colour="#2F4858")+
-  geom_errorbar(aes(ymin=mean_eggs- std.error, ymax=mean_eggs+std.error),colour="#2F4858", width=.2)+
-  theme(axis.text.x = element_text(angle=90))+
-  facet_grid(~School, scales = "free_x")+
-  ylab("Mean Eggs Per Slide")+ xlab("Sampling Time")+
-  ggsave("intensity_pzq_naive_6yo.pdf")
 
 # infection prevalence plot ALL AGES in 2004#
 # trust these #
@@ -339,10 +304,38 @@ pzq_naive_all %>%
   ylab("Infection Prevalence")+
   ggsave("prev_naive_all_ages.pdf")
 
+# change the timing labels because the same number of samples are available but the "month" labels are misleading as not all places have the same months
+
+pzq_naive_all$sample_period <- NA
+
+for(i in 1:nrow(pzq_naive_all)){
+  if(pzq_naive_all[i,3]=="Baseline 2004"){
+    pzq_naive_all[i,ncol(pzq_naive_all)] <- "2004"
+  } else if(pzq_naive_all[i,3]=="June 2005"){
+    pzq_naive_all[i,ncol(pzq_naive_all)] <- "2005"    
+  } else if(pzq_naive_all[i,3]=="May 2006"){
+    pzq_naive_all[i,ncol(pzq_naive_all)] <- "2006"
+  } else if(pzq_naive_all[i,3]=="Feb 2013"){
+    pzq_naive_all[i,ncol(pzq_naive_all)] <- "2013"
+  } else if(pzq_naive_all[i,3]=="May 2014"){
+    pzq_naive_all[i,ncol(pzq_naive_all)] <- "2014"
+  } else if(pzq_naive_all[i,3]=="March 2017"){
+    pzq_naive_all[i,ncol(pzq_naive_all)] <- "2017"
+  } else {
+    pzq_naive_all[i,ncol(pzq_naive_all)] <- "2017"
+  }
+}
+
+pzq_naive_all$sample_period <- as.factor(pzq_naive_all$sample_period)
+
+prev_bl_allyrs <- glmer(prevalence ~ School + sample_period + School*sample_period+ (1|CID), data=pzq_naive_all, family=binomial(link = "logit"))
+
+summary(prev_bl_allyrs)
+
 # Infection intensity plot ALL AGES in 2004#
 
 pzq.errorbars <- pzq_naive_all %>% group_by(School, Month) %>%
-  summarise(mean_eggs=mean(`mean eggs per slide`, na.rm = T), n=n(), sd=sd(`mean eggs per slide`, na.rm=T), std.error=sd/sqrt(n))
+  summarise(mean_eggs=mean(MeanSm, na.rm = T), n=n(), sd=sd(MeanSm, na.rm=T), std.error=sd/sqrt(n))
 
 pzq.errorbars%>% 
   ggplot(aes(y=mean_eggs, x=Month, group=School)) +
@@ -353,6 +346,7 @@ pzq.errorbars%>%
   facet_grid(~School, scales = "free_x")+
   ylab("Mean Eggs Per Slide")+ xlab("Sampling Time")+
   ggsave("intensity_pzq_naive_all.pdf")
+
 
 
 #### Egg reduction ####
