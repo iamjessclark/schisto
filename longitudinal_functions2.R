@@ -273,22 +273,12 @@ school_relabel <- function(dataframe){
 }
 
 
-#### Percent Change function ####
+#### ERR functions ####
 
-percent.change <- function(new,old){
-  value <- ((new-old)/old)*100
-  return(value)
+err_func <- function(df, meanPreT, meanPostT){
+  df$ERR <- ((meanPreT-meanPostT)/meanPreT)*100
+    return(df)
 }
-
-
-
-
-
-
-
-
-
-
 
 
 
