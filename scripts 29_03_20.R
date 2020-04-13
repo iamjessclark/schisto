@@ -296,34 +296,34 @@ pzq_naive_all$Month <- factor(pzq_naive_all$Month, levels = c("Baseline 2004", "
 
 # infection prevalence plot #
 # DONT TRUST THESE TWO FIGURES!!!!!!!! #
-pzq_naive_full%>% 
-  mutate_if(is.character, as.factor)%>%
-  count(Month, School, prevalence) %>% 
-  group_by(Month) %>% 
-  mutate(sum=sum(n)) %>% 
-  mutate(proportion = n/sum) %>% 
-  ggplot(aes(y=proportion, x=Month, fill=School)) +
-  geom_col(position = "dodge", fill="#F6AE2D")+
-  theme(axis.text.x = element_text(angle=90))+
-  facet_grid(~School, scales = "free_x")+
-  ylab("Infection Prevalence")+
-  ggsave("prevalence_pzq_naive_6yo.pdf")
+#pzq_naive_full%>% 
+  #mutate_if(is.character, as.factor)%>%
+  #count(Month, School, prevalence) %>% 
+  #group_by(Month) %>% 
+  #mutate(sum=sum(n)) %>% 
+  #mutate(proportion = n/sum) %>% 
+  #ggplot(aes(y=proportion, x=Month, fill=School)) +
+  #geom_col(position = "dodge", fill="#F6AE2D")+
+  #theme(axis.text.x = element_text(angle=90))+
+  #facet_grid(~School, scales = "free_x")+
+  #ylab("Infection Prevalence")+
+  #ggsave("prevalence_pzq_naive_6yo.pdf")
 
 
 # Infection intensity plot #
 
-pzq.errorbars <- pzq_naive_full %>% group_by(School, Month) %>%
-  summarise(mean_eggs=mean(`mean eggs per slide`, na.rm = T), n=n(), sd=sd(`mean eggs per slide`, na.rm=T), std.error=sd/sqrt(n))
+#pzq.errorbars <- pzq_naive_full %>% group_by(School, Month) %>%
+  #summarise(mean_eggs=mean(`mean eggs per slide`, na.rm = T), n=n(), sd=sd(`mean eggs per slide`, na.rm=T), std.error=sd/sqrt(n))
 
-pzq.errorbars%>% 
-  ggplot(aes(y=mean_eggs, x=Month, group=School)) +
-  geom_point(colour="#F6AE2D", size=4)+
-  geom_line(colour="#2F4858")+
-  geom_errorbar(aes(ymin=mean_eggs- std.error, ymax=mean_eggs+std.error),colour="#2F4858", width=.2)+
-  theme(axis.text.x = element_text(angle=90))+
-  facet_grid(~School, scales = "free_x")+
-  ylab("Mean Eggs Per Slide")+ xlab("Sampling Time")+
-  ggsave("intensity_pzq_naive_6yo.pdf")
+#pzq.errorbars%>% 
+  #ggplot(aes(y=mean_eggs, x=Month, group=School)) +
+  #geom_point(colour="#F6AE2D", size=4)+
+  #geom_line(colour="#2F4858")+
+  #geom_errorbar(aes(ymin=mean_eggs- std.error, ymax=mean_eggs+std.error),colour="#2F4858", width=.2)+
+  #theme(axis.text.x = element_text(angle=90))+
+  #facet_grid(~School, scales = "free_x")+
+  #ylab("Mean Eggs Per Slide")+ xlab("Sampling Time")+
+  #ggsave("intensity_pzq_naive_6yo.pdf")
 
 # infection prevalence plot ALL AGES in 2004#
 # trust these #
