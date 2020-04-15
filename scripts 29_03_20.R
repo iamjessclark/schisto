@@ -617,21 +617,240 @@ ggplot() +
   geom_hline(yintercept = 90)+
   ggsave("eggreductionrate.pdf")
   
+
+ERR_data <- ERR_data %>% mutate_if(is.character, as.factor)
+
+
 #### Cure Rates ####
 
+cure_rates <- err_long_data %>% select(CID, School, Month, MeanSm)
+
+cure_rates <- data.frame(cure_rates)
+
+cure_rates <- as.data.frame(reshape(cure_rates, idvar = c("CID", "School"), timevar = "Month", v.names = "MeanSm", direction = "wide")) #object has to be a dataframe not a tibble for this to work 
+
+cure_rates_04 <- cure_rates %>% select(CID, `MeanSm.Baseline 2004`,`MeanSm.Aug 4wk PT` )%>%rename(cid="CID")
+cure_rates_04$time <- as.factor("Baseline 2004 to 4wk PT")
+cure_rates_04 <- cure_rates_04[-which(is.na(cure_rates_04$`MeanSm.Baseline 2004`)==T),]
+cure_rates_04 <- cure_rates_04[-which(is.na(cure_rates_04$`MeanSm.Aug 4wk PT`)==T),]
+cure_rates_04 <- school_relabel(cure_rates_04)
+cure_rates_04$cure_rate <- NA
+for(i in 1:nrow(cure_rates_04)){
+  if(cure_rates_04[i,3]<cure_rates_04[i,2]){
+    cure_rates_04[i,ncol(cure_rates_04)] <- "cured"
+  } else if(cure_rates_04[i,2]==0 & cure_rates_04[i,3]==0){
+    cure_rates_04[i,ncol(cure_rates_04)] <- "not infected"
+  } else if(cure_rates_04[i,3]>cure_rates_04[i,2]){
+    cure_rates_04[i,ncol(cure_rates_04)] <- "not cured"
+  }
+}
+
+cure_rates_05 <- cure_rates %>% select(CID,`MeanSm.June 2005`,`MeanSm.July 05 4wk PT`  )%>%rename(cid="CID")
+cure_rates_05$time <- as.factor("June 2005 to 4wk PT")
+cure_rates_05 <- cure_rates_05[-which(is.na(cure_rates_05$`MeanSm.June 2005`)==T),]
+cure_rates_05 <- cure_rates_05[-which(is.na(cure_rates_05$`MeanSm.July 05 4wk PT`)==T),]
+cure_rates_05 <- school_relabel(cure_rates_05)
+cure_rates_05$cure_rate <- NA
+for(i in 1:nrow(cure_rates_05)){
+  if(cure_rates_05[i,3]<cure_rates_05[i,2]){
+    cure_rates_05[i,ncol(cure_rates_05)] <- "cured"
+  } else if(cure_rates_05[i,2]==0 & cure_rates_05[i,3]==0){
+    cure_rates_05[i,ncol(cure_rates_05)] <- "not infected"
+  } else if(cure_rates_05[i,3]>cure_rates_05[i,2]){
+    cure_rates_05[i,ncol(cure_rates_05)] <- "not cured"
+  }else if(cure_rates_05[i,3]==cure_rates_05[i,2]){
+    cure_rates_05[i,ncol(cure_rates_05)] <- "not cured"
+  }
+}
 
 
+cure_rates_06 <- cure_rates %>% select(CID,`MeanSm.May 2006`, `MeanSm.July 06 4wk PT` )%>%rename(cid="CID")
+cure_rates_06$time <- as.factor("May 2006 to 4wk PT")
+cure_rates_06 <- cure_rates_06[-which(is.na(cure_rates_06$`MeanSm.May 2006`)==T),]
+cure_rates_06 <- cure_rates_06[-which(is.na(cure_rates_06$`MeanSm.July 06 4wk PT`)==T),]
+cure_rates_06 <- school_relabel(cure_rates_06)
+cure_rates_06$cure_rate <- NA
+for(i in 1:nrow(cure_rates_06)){
+  if(cure_rates_06[i,3]<cure_rates_06[i,2]){
+    cure_rates_06[i,ncol(cure_rates_06)] <- "cured"
+  } else if(cure_rates_06[i,2]==0 & cure_rates_06[i,3]==0){
+    cure_rates_06[i,ncol(cure_rates_06)] <- "not infected"
+  } else if(cure_rates_06[i,3]>cure_rates_06[i,2]){
+    cure_rates_06[i,ncol(cure_rates_06)] <- "not cured"
+  }else if(cure_rates_06[i,3]==cure_rates_06[i,2]){
+    cure_rates_06[i,ncol(cure_rates_06)] <- "not cured"
+  }
+}
+
+cure_rates_13 <- cure_rates %>% select(CID,`MeanSm.Feb 2013`, `MeanSm.March 3wk PT` )%>% rename(cid="CID")
+cure_rates_13$time <- as.factor("Feb 2013 to 3wk PT")
+cure_rates_13 <- cure_rates_13[-which(is.na(cure_rates_13$`MeanSm.Feb 2013`)==T),]
+cure_rates_13 <- cure_rates_13[-which(is.na(cure_rates_13$`MeanSm.March 3wk PT`)==T),]
+cure_rates_13 <- school_relabel(cure_rates_13)
+cure_rates_13$cure_rate <- NA
+for(i in 1:nrow(cure_rates_13)){
+  if(cure_rates_13[i,3]<cure_rates_13[i,2]){
+    cure_rates_13[i,ncol(cure_rates_13)] <- "cured"
+  } else if(cure_rates_13[i,2]==0 & cure_rates_13[i,3]==0){
+    cure_rates_13[i,ncol(cure_rates_13)] <- "not infected"
+  } else if(cure_rates_13[i,3]>cure_rates_13[i,2]){
+    cure_rates_13[i,ncol(cure_rates_13)] <- "not cured"
+  }else if(cure_rates_13[i,3]==cure_rates_13[i,2]){
+    cure_rates_13[i,ncol(cure_rates_13)] <- "not cured"
+  }
+}
+
+cure_rates_14 <- cure_rates %>% select(CID,`MeanSm.May 2014`, `MeanSm.June 4wk PT` )%>% rename(cid="CID")
+cure_rates_14$time <- as.factor("May 2014 to 4wk PT")
+cure_rates_14 <- cure_rates_14[-which(is.na(cure_rates_14$`MeanSm.May 2014`)==T),]
+cure_rates_14 <- cure_rates_14[-which(is.na(cure_rates_14$`MeanSm.June 4wk PT`)==T),]
+cure_rates_14 <- school_relabel(cure_rates_14)
+cure_rates_14$cure_rate <- NA
+for(i in 1:nrow(cure_rates_14)){
+  if(cure_rates_14[i,3]<cure_rates_14[i,2]){
+    cure_rates_14[i,ncol(cure_rates_14)] <- "cured"
+  } else if(cure_rates_14[i,2]==0 & cure_rates_14[i,3]==0){
+    cure_rates_14[i,ncol(cure_rates_14)] <- "not infected"
+  } else if(cure_rates_14[i,3]>cure_rates_14[i,2]){
+    cure_rates_14[i,ncol(cure_rates_14)] <- "not cured"
+  }else if(cure_rates_14[i,3]==cure_rates_14[i,2]){
+    cure_rates_14[i,ncol(cure_rates_14)] <- "not cured"
+  }
+}
+
+cure_rates_long <- bind_rows(cure_rates_04, cure_rates_05, cure_rates_06, cure_rates_13, cure_rates_14)%>% select(cid, School, time, cure_rate)
 
 
+# this is including children who were 0 at bl because if they had eggs at 3/4wks
+# they had to be infected at bl. which then means that treatment didn't successfully
+# clear those infections that were likely juveniles. 
 
+# this does not include children who don't have both counts 
 
+bugoto_cure_1st <- as.data.frame(bugoto)
+bugoto_cure_1st <- bugoto_cure_1st %>% 
+  filter(Month=="Sept 2017" | Month=="Oct 3wk PT") %>% 
+  select(cid, School, Month, mean.eps)%>%
+  mutate_if(is.character, as.factor)%>%
+  group_by(cid, School, Month) %>%
+  summarise(mean.eps=mean(mean.eps))%>%
+  pivot_wider(names_from = Month, values_from = mean.eps)
 
+bugoto_cure_1st <- bugoto_cure_1st[-which(is.na(bugoto_cure_1st$`Sept 2017`)==T),]
+bugoto_cure_1st <- bugoto_cure_1st[-which(is.na(bugoto_cure_1st$`Oct 3wk PT`)==T),]
+bugoto_cure_1st$cure_rate <- NA
+for(i in 1:nrow(bugoto_cure_1st)){
+  if(bugoto_cure_1st[i,3]<bugoto_cure_1st[i,4]){
+    bugoto_cure_1st[i,ncol(bugoto_cure_1st)] <- "cured"
+  } else if(bugoto_cure_1st[i,3]==0 & bugoto_cure_1st[i,4]==0){
+    bugoto_cure_1st[i,ncol(bugoto_cure_1st)] <- "not infected"
+  } else if(bugoto_cure_1st[i,3]>bugoto_cure_1st[i,4]){
+    bugoto_cure_1st[i,ncol(bugoto_cure_1st)] <- "not cured"
+  }
+}
+bugoto_cure_1st$time <- as.factor("Sept 2017 to 3wk PT")
 
+bugoto_cure_2nd <- as.data.frame(bugoto)
+bugoto_cure_2nd <- bugoto_cure_2nd %>% 
+  filter(Month=="March 2018" | Month=="March 2018 3wk PT") %>% 
+  select(cid, School, Month, mean.eps)%>%
+  mutate_if(is.character, as.factor)%>%
+  group_by(cid, School, Month) %>%
+  summarise(mean.eps=mean(mean.eps))%>%
+  pivot_wider(names_from = Month, values_from = mean.eps)
 
+bugoto_cure_2nd <- bugoto_cure_2nd[-which(is.na(bugoto_cure_2nd$`March 2018`)==T),]
+bugoto_cure_2nd <- bugoto_cure_2nd[-which(is.na(bugoto_cure_2nd$`March 2018 3wk PT`)==T),]
 
+bugoto_cure_2nd$cure_rate <- NA
+for(i in 1:nrow(bugoto_cure_2nd)){
+  if(bugoto_cure_2nd[i,4]<bugoto_cure_2nd[i,3]){
+    bugoto_cure_2nd[i,ncol(bugoto_cure_2nd)] <- "cured"
+  } else if(bugoto_cure_2nd[i,3]==0 & bugoto_cure_2nd[i,4]==0){
+    bugoto_cure_2nd[i,ncol(bugoto_cure_2nd)] <- "not infected"
+  } else if(bugoto_cure_2nd[i,4]>bugoto_cure_2nd[i,3]){
+    bugoto_cure_2nd[i,ncol(bugoto_cure_2nd)] <- "not cured"
+  }
+}
+bugoto_cure_2nd$time <- as.factor("March 2018 to 3wk PT")
 
+bwondha_cure <- bwondha
+bwondha_cure <- bwondha_cure %>% 
+  filter(Month=="Feb 2018" | Month=="March 2018") %>% 
+  select(cid, School, Month, mean.eps)%>%
+  mutate_if(is.character, as.factor)%>%
+  group_by(cid, School, Month) %>%
+  summarise(mean.eps=mean(mean.eps))%>%
+  pivot_wider(names_from = Month, values_from = mean.eps)%>%
+  mutate_if(is.character, as.factor)
 
+bwondha_cure <- bwondha_cure[-which(is.na(bwondha_cure$`Feb 2018`)==T),]
+bwondha_cure <- bwondha_cure[-which(is.na(bwondha_cure$`March 2018`)==T),]
 
+bwondha_cure$cure_rate <- NA
+for(i in 1:nrow(bwondha_cure)){
+  if(bwondha_cure[i,4]<bwondha_cure[i,3]){
+    bwondha_cure[i,ncol(bwondha_cure)] <- "cured"
+  } else if(bwondha_cure[i,3]==0 & bwondha_cure[i,4]==0){
+    bwondha_cure[i,ncol(bwondha_cure)] <- "not infected"
+  } else if(bwondha_cure[i,4]>bwondha_cure[i,3]){
+    bwondha_cure[i,ncol(bwondha_cure)] <- "not cured"
+  }
+}
+bwondha_cure$time <- as.factor("Feb 2018 to 3wk PT")
+
+musubi_cure <- musubi
+musubi_cure <- musubi_cure %>% 
+  filter(Month=="March 2018" | Month=="March 2018 3wk PT") %>% 
+  select(cid, School, Month, mean.eps)%>%
+  mutate_if(is.character, as.factor)%>%
+  group_by(cid, School, Month) %>%
+  summarise(mean.eps=mean(mean.eps))%>%
+  pivot_wider(names_from = Month, values_from = mean.eps)
+
+musubi_cure <- musubi_cure[-which(is.na(musubi_cure$`March 2018`)==T),]
+musubi_cure <- musubi_cure[-which(is.na(musubi_cure$`March 2018 3wk PT`)==T),]
+
+musubi_cure$cure_rate <- NA
+for(i in 1:nrow(musubi_cure)){
+  if(musubi_cure[i,4]<musubi_cure[i,3]){
+    musubi_cure[i,ncol(musubi_cure)] <- "cured"
+  } else if(musubi_cure[i,3]==0 & musubi_cure[i,4]==0){
+    musubi_cure[i,ncol(musubi_cure)] <- "not infected"
+  } else if(musubi_cure[i,4]>musubi_cure[i,3]){
+    musubi_cure[i,ncol(musubi_cure)] <- "not cured"
+  }
+}
+musubi_cure$time <- as.factor("March 2018 to 3wk PT")
+
+cure_rates_all <- bind_rows(bugoto_cure_1st, bugoto_cure_2nd, bwondha_cure, musubi_cure)%>% 
+  select(cid, School, cure_rate, time)
+cure_rates_all <- bind_rows(cure_rates_long, cure_rates_all)%>%mutate_if(is.character, as.factor)
+cure_rates_all <- cure_rates_all[-which(is.na(cure_rates_all$cure_rate)==T),]
+cure_rates_all$time <- factor(cure_rates_all$time, levels = c("Baseline 2004 to 4wk PT", "June 2005 to 4wk PT",
+                                                                              "May 2006 to 4wk PT" ,  "Feb 2013 to 3wk PT",
+                                                                              "May 2014 to 4wk PT", "Sept 2017 to 3wk PT",
+                                                                              "Feb 2018 to 3wk PT",  "March 2018 to 3wk PT" ))
+cure_rates_all%>%
+  group_by(School, time, cure_rate)%>%
+  summarise(n=n())%>%
+  mutate(freq=n/sum(n))%>%
+  ggplot(aes(x=cure_rate, y=freq, fill=School))+
+  geom_col(position = "dodge")+
+  scale_fill_manual(values=colours)+
+  theme(axis.text.x = element_text(size = 14),
+        axis.text.y = element_text(size = 14),
+        strip.text.x = element_text(size = 14,face="bold"),
+        strip.text.y = element_text(size = 14,face="bold",angle=360),
+        axis.title=element_text(size=14,face="bold"))+
+  facet_grid(time~School, labeller = label_wrap_gen(width=10))+
+  ylab("Proportion")+
+  ggsave("cure_rates.pdf")
+
+#### analysis ####
+
+cure_rates_m1 <- glmer(cure_rate ~ School + time + (1|cid), data=cure_rates_all, family=binomial(link=logit))
+summary(cure_rates_m1)
 
 
 
