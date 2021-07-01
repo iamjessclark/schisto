@@ -238,6 +238,8 @@ KK.mus.BLT <- read_csv("kk_musubi_2017.10.10_clean.csv") # Sep 2017
 KK.mus.6mT <- read_csv("kk_musubi_2018.02.28_clean.csv") # Feb/ March 2018 
 KK.mus.3wk <- read_csv("kk_musubi_2018.03.26_clean.csv") # Mar 2018
 
+
+
 data_2017_2018 <- recent_data(KK.bug.BLT, KK.bug.6mT.2017, KK.bug.6m3wk, KK.bug.6m9wk, KK.bug.6mT2018, KK.bug.6m3wk2018, 
                               KK.bwo.BLT, KK.bwo.4mT, KK.bwo.3wk, KK.mus.BLT, KK.mus.6mT, KK.mus.3wk)
 
@@ -270,6 +272,7 @@ pzq_naive_full$Month <- factor(pzq_naive_full$Month, levels = c("Baseline 2004",
                                                                 "May 2014", "March 2017", "Sept 2017", 
                                                                 "Feb 2018", "March 2018" ))
 
+
 #### data with all ages for musubi in 2004 #### 
 musubi04 <- musubi_baseline %>% filter(Week=="0") %>% 
   select(CID, School, Month, event, MeanSm)%>%
@@ -290,6 +293,8 @@ pzq_naive_all <- bind_rows(pzq_naive, pzq_naive_17_18)
 pzq_naive_all <- pzq_naive_all %>% mutate_if(is.character, as.factor)
 pzq_naive_all$Month <- factor(pzq_naive_all$Month, levels = c("Baseline 2004", "June 2005", "May 2006", "Feb 2013", 
                                                                 "May 2014", "March 2017", "Sept 2017"))
+
+write.csv(pzq_naive_all, "pzq.naive.each.yr.csv")
 #### Across years ####
 
 #### Figures ####
@@ -340,6 +345,29 @@ pzq_naive_all %>%
   ylab("Infection Prevalence")+
   ggsave("prev_naive_all_ages.pdf")
 
+# just bugoto for  ASTMH talk
+pzq_naive_all %>%
+  group_by(School, Month, prevalence) %>%
+  filter(School=="Bugoto") %>%
+  summarise(n = n()) %>%
+  mutate(freq = n / sum(n))%>%
+  filter(prevalence=="1")%>%
+  ggplot(aes(x=Month, y=freq))+
+  geom_col(position = "dodge", fill="#F6AE2D", colour="#2F4858")+
+  theme(#axis.text.x = element_text(angle=90), 
+        axis.title.x = element_text(colour="white", size = 16), 
+        axis.title.y = element_text(colour="white", size = 16),
+        axis.text.x = element_text(colour = "white", size = 14),
+        axis.text.y = element_text(colour="white", size = 14), 
+        axis.ticks.x = element_line(colour="white"),
+        axis.ticks.y = element_line(colour="white"), 
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_rect(fill = "transparent",colour = NA),
+        plot.background = element_rect(fill = "transparent",colour = NA))+
+  ylab("Infection Prevalence")+
+  ggsave("prev_naive_bug.pdf")
+
 # Infection intensity plot ALL AGES in 2004#
 
 pzq.errorbars <- pzq_naive_all %>% group_by(School, Month) %>%
@@ -361,22 +389,22 @@ pzq.errorbars%>%
 err_long_data <- long_data %>% filter(Month == "Baseline 2004"| Month =="Aug 4wk PT"| Month =="June 2005" |Month == "July 05 4wk PT" | Month == "May 2006" |Month == "July 06 4wk PT" | Month == "Feb 2013" |Month == "March 3wk PT" |Month =="May 2014" | Month =="June 4wk PT" )
 err_long_data$Week <- factor(err_long_data$Week)
 err_long_data <- err_long_data %>% filter(Week !="26")%>%
-  select(CID, AGE, School, Year, Week, Month, MeanSm)%>%
+  select(CID, AGE, SEX, School, Year, Week, Month, MeanSm)%>%
   mutate_if(is.character, as.factor)
 err_long_data$Week <- factor(err_long_data$Week)
 err_long_data$Year <- as.factor(err_long_data$Year)
 err_long_data$MeanSm <- as.integer(err_long_data$MeanSm)
 err_long_data <- as.data.frame(err_long_data)
-err_long_data2 <- err_long_data %>% select(CID, AGE, School, Month, MeanSm)
+err_long_data2 <- err_long_data %>% select(CID, AGE, SEX, School, Month, MeanSm)
 err_long_data2 <- as.data.frame(err_long_data2)
 err_long_data2$Month <- factor(err_long_data2$Month)
 #err_long_data <- err_long_data %>% pivot_wider(names_from = Week, values_from = MeanSm)
-err_long_data2 <- as.data.frame(reshape(err_long_data2, idvar = c("CID", "School", "AGE"), timevar = "Month", v.names = "MeanSm", direction = "wide")) #object has to be a dataframe not a tibble for this to work 
+err_long_data2 <- as.data.frame(reshape(err_long_data2, idvar = c("CID", "School", "AGE", "SEX"), timevar = "Month", v.names = "MeanSm", direction = "wide")) #object has to be a dataframe not a tibble for this to work 
 
 #### Long Data ####
 # not using any children who don't have both counts
-err_trt_2004 <- as.data.frame(cbind(as.character(err_long_data2$CID),as.character(err_long_data2$AGE), err_long_data2$`MeanSm.Baseline 2004`, err_long_data2$`MeanSm.Aug 4wk PT`))
-err_trt_2004 <- err_trt_2004 %>% mutate_if(is.character, as.factor)%>% rename(cid="V1", `age`="V2",`baseline 2004`="V3", `Aug 4wk PT`="V4")
+err_trt_2004 <- as.data.frame(cbind(as.character(err_long_data2$CID),as.character(err_long_data2$AGE),as.character(err_long_data2$SEX), err_long_data2$`MeanSm.Baseline 2004`, err_long_data2$`MeanSm.Aug 4wk PT`))
+err_trt_2004 <- err_trt_2004 %>% mutate_if(is.character, as.factor)%>% rename(cid="V1", `age`="V2",`sex`="V3",`baseline 2004`="V4", `Aug 4wk PT`="V5")
 err_trt_2004 <- err_trt_2004[-which(is.na(err_trt_2004$`baseline 2004`)==T),]
 err_trt_2004 <- err_trt_2004[-which(is.na(err_trt_2004$`Aug 4wk PT`)==T),]
 err_trt_2004 <- school_relabel(err_trt_2004)
@@ -393,10 +421,10 @@ for(i in 1:nrow(err_trt_2004)){
   )
 }
 err_trt_2004$time <- as.factor("`Baseline to Aug 4wk PT`")
-err_trt_2004 <- err_trt_2004 %>% select(cid, age, School, time, ERR)
+err_trt_2004 <- err_trt_2004 %>% select(cid, age, sex, School, time, ERR)
 
-err_trt_2005 <- as.data.frame(cbind(as.character(err_long_data2$CID), as.character(err_long_data2$AGE), err_long_data2$`MeanSm.June 2005`, err_long_data2$`MeanSm.July 05 4wk PT`))
-err_trt_2005 <- err_trt_2005 %>% mutate_if(is.character, as.factor)%>% rename(cid="V1", `age`="V2", `June 2005`="V3", `July 05 4wk PT`="V4")
+err_trt_2005 <- as.data.frame(cbind(as.character(err_long_data2$CID), as.character(err_long_data2$AGE),as.character(err_long_data2$SEX), err_long_data2$`MeanSm.June 2005`, err_long_data2$`MeanSm.July 05 4wk PT`))
+err_trt_2005 <- err_trt_2005 %>% mutate_if(is.character, as.factor)%>% rename(cid="V1", age="V2", sex="V3",`June 2005`="V4", `July 05 4wk PT`="V5")
 err_trt_2005 <- err_trt_2005[-which(is.na(err_trt_2005$`June 2005`)==T),]
 err_trt_2005 <- err_trt_2005[-which(is.na(err_trt_2005$`July 05 4wk PT`)==T),]
 err_trt_2005 <- school_relabel(err_trt_2005)
@@ -413,10 +441,10 @@ for(i in 1:nrow(err_trt_2005)){
   )
 }
 err_trt_2005$time <- as.factor("`June 2005 to 4wk PT`")
-err_trt_2005 <- err_trt_2005 %>% select(cid, age, School, time, ERR)
+err_trt_2005 <- err_trt_2005 %>% select(cid, age, sex, School, time, ERR)
 
-err_trt_2006 <- as.data.frame(cbind(as.character(err_long_data2$CID), as.character(err_long_data2$AGE), err_long_data2$`MeanSm.May 2006`, err_long_data2$`MeanSm.July 06 4wk PT`))
-err_trt_2006 <- err_trt_2006 %>% mutate_if(is.character, as.factor)%>% rename(cid="V1", age="V2",`May 2006`="V3", `July 06 4wk PT`="V4")
+err_trt_2006 <- as.data.frame(cbind(as.character(err_long_data2$CID), as.character(err_long_data2$AGE),as.character(err_long_data2$SEX), err_long_data2$`MeanSm.May 2006`, err_long_data2$`MeanSm.July 06 4wk PT`))
+err_trt_2006 <- err_trt_2006 %>% mutate_if(is.character, as.factor)%>% rename(cid="V1", age="V2",sex="V3",`May 2006`="V4", `July 06 4wk PT`="V5")
 err_trt_2006 <- err_trt_2006[-which(is.na(err_trt_2006$`May 2006`)==T),]
 err_trt_2006 <- err_trt_2006[-which(is.na(err_trt_2006$`July 06 4wk PT`)==T),]
 err_trt_2006 <- school_relabel(err_trt_2006)
@@ -433,10 +461,10 @@ for(i in 1:nrow(err_trt_2006)){
   )
 }
 err_trt_2006$time <- as.factor("`May 2006 to 4wk PT`")
-err_trt_2006 <- err_trt_2006 %>% select(cid, age, School, time, ERR)
+err_trt_2006 <- err_trt_2006 %>% select(cid, age, sex, School, time, ERR)
 
-err_trt_2013 <- as.data.frame(cbind(as.character(err_long_data2$CID),as.character(err_long_data2$AGE), err_long_data2$`MeanSm.Feb 2013`, err_long_data2$`MeanSm.March 3wk PT`))
-err_trt_2013 <- err_trt_2013 %>% mutate_if(is.character, as.factor)%>% rename(cid="V1", age="V2",`Feb 2013`="V3", `March 3wk PT`="V4")
+err_trt_2013 <- as.data.frame(cbind(as.character(err_long_data2$CID),as.character(err_long_data2$AGE),as.character(err_long_data2$SEX), err_long_data2$`MeanSm.Feb 2013`, err_long_data2$`MeanSm.March 3wk PT`))
+err_trt_2013 <- err_trt_2013 %>% mutate_if(is.character, as.factor)%>% rename(cid="V1", age="V2",sex="V3",`Feb 2013`="V4", `March 3wk PT`="V5")
 err_trt_2013 <- err_trt_2013[-which(is.na(err_trt_2013$`Feb 2013`)==T),]
 err_trt_2013 <- err_trt_2013[-which(is.na(err_trt_2013$`March 3wk PT`)==T),]
 err_trt_2013 <- school_relabel(err_trt_2013)
@@ -453,10 +481,10 @@ for(i in 1:nrow(err_trt_2013)){
   )
 }
 err_trt_2013$time <- as.factor("`Feb 2013 to 3wk PT`")
-err_trt_2013 <- err_trt_2013 %>% select(cid, age, School, time, ERR)
+err_trt_2013 <- err_trt_2013 %>% select(cid, age, sex, School, time, ERR)
 
-err_trt_2014 <- as.data.frame(cbind(as.character(err_long_data2$CID),as.character(err_long_data2$AGE), err_long_data2$`MeanSm.May 2014`, err_long_data2$`MeanSm.June 4wk PT`))
-err_trt_2014 <- err_trt_2014 %>% mutate_if(is.character, as.factor)%>% rename(cid="V1", age="V2",`May 2014`="V3", `June 4wk PT`="V4")
+err_trt_2014 <- as.data.frame(cbind(as.character(err_long_data2$CID),as.character(err_long_data2$AGE),as.character(err_long_data2$SEX), err_long_data2$`MeanSm.May 2014`, err_long_data2$`MeanSm.June 4wk PT`))
+err_trt_2014 <- err_trt_2014 %>% mutate_if(is.character, as.factor)%>% rename(cid="V1", age="V2",sex="V3",`May 2014`="V4", `June 4wk PT`="V5")
 err_trt_2014 <- err_trt_2014[-which(is.na(err_trt_2014$`May 2014`)==T),]
 err_trt_2014 <- err_trt_2014[-which(is.na(err_trt_2014$`June 4wk PT`)==T),]
 err_trt_2014 <- school_relabel(err_trt_2014)
@@ -473,7 +501,7 @@ for(i in 1:nrow(err_trt_2014)){
   )
 }
 err_trt_2014$time <- as.factor("`May 2014 to 4wk PT`")
-err_trt_2014 <- err_trt_2014 %>% select(cid, age, School, time, ERR)
+err_trt_2014 <- err_trt_2014 %>% select(cid, age, sex, School, time, ERR)
 
 egg_reduction <- bind_rows(err_trt_2004, err_trt_2005, err_trt_2006, err_trt_2013, err_trt_2014)%>%
   mutate_if(is.character, as.factor)
@@ -483,12 +511,12 @@ egg_reduction <- bind_rows(err_trt_2004, err_trt_2005, err_trt_2006, err_trt_201
 bugoto <- subset(data_2017_2018, School == "Bugoto")
 
 bugoto_1st <- bugoto %>% filter(Month=="Sept 2017" | Month=="Oct 3wk PT")%>%
-  select(cid, School, Month, mean.eps)
+  select(cid, School, Month, mean.eps, SEX)
 bugoto_1st$cid <- as.factor(bugoto_1st$cid)
-  bugoto_1st <- bugoto_1st %>% group_by(cid, School, Month) %>%
+  bugoto_1st <- bugoto_1st %>% group_by(cid, School, Month, SEX) %>%
   summarise(mean.eps=mean(mean.eps))
 bugoto_1st <- as.data.frame(bugoto_1st)
-bugoto_1st <- as.data.frame(reshape(bugoto_1st, idvar = c("cid", "School"), timevar = "Month", v.names = "mean.eps", direction = "wide")) #object has to be a dataframe not a tibble for this to work 
+bugoto_1st <- as.data.frame(reshape(bugoto_1st, idvar = c("cid", "School", "SEX"), timevar = "Month", v.names = "mean.eps", direction = "wide")) #object has to be a dataframe not a tibble for this to work 
 bugoto_1st$ERR <- NA
 bugoto_1st <- bugoto_1st[-which(is.na(bugoto_1st$`mean.eps.Oct 3wk PT`)==T),]
 bugoto_1st <- bugoto_1st[-which(is.na(bugoto_1st$`mean.eps.Sept 2017`)==T),]
@@ -504,15 +532,15 @@ for(i in 1:nrow(bugoto_1st)){
 }
 
 bugoto_1st$time <- as.factor("`Sept 2017 to 3wk PT`")
-bugoto_1st <- bugoto_1st %>% select(cid, School, time, ERR)
+bugoto_1st <- bugoto_1st %>% select(cid, School, time, ERR, SEX)
 
 bugoto_2nd <- bugoto %>% filter(Month=="March 2018" | Month=="March 2018 3wk PT")%>%
-  select(cid, School, Month, mean.eps)
+  select(cid, School, Month, mean.eps, SEX)
 bugoto_2nd$cid <- as.factor(bugoto_2nd$cid)
-bugoto_2nd <- bugoto_2nd %>% group_by(cid, School, Month) %>%
+bugoto_2nd <- bugoto_2nd %>% group_by(cid, School, Month, SEX) %>%
   summarise(mean.eps=mean(mean.eps))
 bugoto_2nd <- as.data.frame(bugoto_2nd)
-bugoto_2nd <- as.data.frame(reshape(bugoto_2nd, idvar = c("cid", "School"), timevar = "Month", v.names = "mean.eps", direction = "wide")) #object has to be a dataframe not a tibble for this to work 
+bugoto_2nd <- as.data.frame(reshape(bugoto_2nd, idvar = c("cid", "School", "SEX"), timevar = "Month", v.names = "mean.eps", direction = "wide")) #object has to be a dataframe not a tibble for this to work 
 bugoto_2nd$ERR <- "NA"
 bugoto_2nd <- bugoto_2nd[-which(is.na(bugoto_2nd$`mean.eps.March 2018`)==T),]
 bugoto_2nd <- bugoto_2nd[-which(is.na(bugoto_2nd$`mean.eps.March 2018 3wk PT`)==T),]
@@ -528,16 +556,16 @@ for(i in 1:nrow(bugoto_2nd)){
 }
 
 bugoto_2nd$time <- as.factor("`March 2018 to 3wk PT`")
-bugoto_2nd <- bugoto_2nd %>% select(cid, School, time, ERR)
+bugoto_2nd <- bugoto_2nd %>% select(cid, School, time, ERR, SEX)
 
 bwondha <- subset(data_2017_2018, School == "Bwondha")
 bwondha_1st <- bwondha %>% filter(Month=="Feb 2018" | Month=="March 2018")%>%
-  select(cid, School, Month, mean.eps)
+  select(cid, School, Month, mean.eps, SEX)
 bwondha_1st$cid <- as.factor(bwondha_1st$cid)
-bwondha_1st <- bwondha_1st %>% group_by(cid, School, Month) %>%
+bwondha_1st <- bwondha_1st %>% group_by(cid, School, Month, SEX) %>%
   summarise(mean.eps=mean(mean.eps))
 bwondha_1st <- as.data.frame(bwondha_1st)
-bwondha_1st <- as.data.frame(reshape(bwondha_1st, idvar = c("cid","School"), timevar = "Month", v.names = "mean.eps", direction = "wide")) #object has to be a dataframe not a tibble for this to work 
+bwondha_1st <- as.data.frame(reshape(bwondha_1st, idvar = c("cid","School", "SEX"), timevar = "Month", v.names = "mean.eps", direction = "wide")) #object has to be a dataframe not a tibble for this to work 
 bwondha_1st$ERR <- NA
 bwondha_1st <- bwondha_1st[-which(is.na(bwondha_1st$`mean.eps.Feb 2018`)==T),]
 bwondha_1st <- bwondha_1st[-which(is.na(bwondha_1st$`mean.eps.March 2018`)==T),]
@@ -553,16 +581,18 @@ for(i in 1:nrow(bwondha_1st)){
 }
 
 bwondha_1st$time <- as.factor("`Feb 2018 to 3wk PT`")
-bwondha_1st <- bwondha_1st %>% select(cid, School, time, ERR)
+bwondha_1st <- bwondha_1st %>% select(cid, School, time, ERR, SEX)
 
 musubi <- subset(data_2017_2018, School == "Musubi")
 musubi_1st <- musubi %>% filter(Month=="March 2018" | Month=="March 2018 3wk PT")%>%
-  select(cid, School, Month, mean.eps)
+  select(cid, School, Month, mean.eps, SEX)
 musubi_1st$cid <- as.factor(musubi_1st$cid)
-musubi_1st <- musubi_1st %>% group_by(cid, School, Month) %>%
+musubi_1st <- musubi_1st %>% group_by(cid, School, Month, SEX) %>%
   summarise(mean.eps=mean(mean.eps))
 musubi_1st <- as.data.frame(musubi_1st)
-musubi_1st <- as.data.frame(reshape(musubi_1st, idvar = "cid", timevar = "Month", v.names = "mean.eps", direction = "wide")) #object has to be a dataframe not a tibble for this to work 
+musubi_1st$SEX <- as.factor(musubi_1st$SEX)
+musubi_1st$cid <- as.factor(musubi_1st$cid)
+musubi_1st <- as.data.frame(reshape(musubi_1st, idvar = c("cid", "School", "SEX"), timevar = "Month", v.names = "mean.eps", direction = "wide")) #object has to be a dataframe not a tibble for this to work 
 musubi_1st$ERR <- NA
 musubi_1st <- musubi_1st[-which(is.na(musubi_1st$`mean.eps.March 2018`)==T),]
 musubi_1st <- musubi_1st[-which(is.na(musubi_1st$`mean.eps.March 2018 3wk PT`)==T),]
@@ -578,11 +608,16 @@ for(i in 1:nrow(musubi_1st)){
 }
 
 musubi_1st$time <- as.factor("`March 2018 to 3wk PT`")
-musubi_1st <- musubi_1st %>% select(cid, School, time, ERR)
+musubi_1st <- musubi_1st %>% select(cid, School, time, ERR, SEX)
 
-egg_red_no_age <- egg_reduction %>% select(-age)
+#egg_red_no_age <- egg_reduction %>% select(-age)
 
-egg_reduction_all_data <- bind_rows(egg_red_no_age, bugoto_1st, bugoto_2nd, bwondha_1st, musubi_1st)
+err.1718 <- bind_rows(bugoto_1st, bugoto_2nd, bwondha_1st, musubi_1st)
+
+err.1718 <- age_extraction(err.1718)
+err.1718 <- err.1718 %>% rename(sex="SEX")
+
+egg_reduction_all_data <- bind_rows(egg_reduction, err.1718)
 egg_reduction_all_data$time <- as.factor(egg_reduction_all_data$time)
 
 egg_reduction_all_data$time <- factor(egg_reduction_all_data$time, levels = c("`Baseline to Aug 4wk PT`", "`June 2005 to 4wk PT`",
@@ -591,7 +626,7 @@ egg_reduction_all_data$time <- factor(egg_reduction_all_data$time, levels = c("`
                                                                               "`Feb 2018 to 3wk PT`",  "`March 2018 to 3wk PT`" ))
 
  
-
+write.csv(egg_reduction_all_data,"egg.reduction.data.csv")
 ERR_data <-  arrange(egg_reduction_all_data, time, ERR) 
 
 ERR_data <- ERR_data %>% group_by(time) %>% mutate(rank =rank(ERR, ties.method = 'first'))
@@ -601,6 +636,8 @@ ERR_sum <- ERR_data %>% group_by(time) %>% summarise(n=n())
 ERR_data <- merge(ERR_data, ERR_sum)
 
 ERR_data$CumPerc <- ERR_data$rank/ERR_data$n
+
+write.csv(ERR_data, "egg.reduction.data.cumulative.percentage.csv")
 
 colours <- c( "dodgerblue3","chocolate", "palegreen4")
 # this figure only has individuals who were 

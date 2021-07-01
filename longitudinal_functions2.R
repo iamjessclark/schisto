@@ -118,7 +118,7 @@ recent_data <- function(KK.bug.BLT, KK.bug.6mT.2017, KK.bug.6m3wk, KK.bug.6m9wk,
   KK.bug.BLT$Year <- "2017"
   KK.bug.BLT <- KK.bug.BLT %>% rowwise() %>% mutate(mean.eps=mean(c(sm_a, sm_b), na.rm = T))
   KK.bug.BLT$School <- "Bugoto"
-  kk.bug.bl <- KK.bug.BLT %>% select(cid,School, time,  Month, `Weeks Since Treatment`, Year, mean.eps)
+  kk.bug.bl <- KK.bug.BLT %>% select(cid,School, time,  Month, `Weeks Since Treatment`, Year, mean.eps, SEX)
   kk.bug.bl$event <- "Treated"
   
   KK.bug.6mT.2017$time <- "B"
@@ -129,7 +129,7 @@ recent_data <- function(KK.bug.BLT, KK.bug.6mT.2017, KK.bug.6m3wk, KK.bug.6m9wk,
   KK.bug.6mT.2017$Year <- "2017"
   KK.bug.6mT.2017$School <- "Bugoto"
   KK.bug.6mT.2017 <- KK.bug.6mT.2017 %>% rowwise() %>% mutate(mean.eps=mean(c(sm_a, sm_b), na.rm = T))
-  kk.bug.6mPostT <- KK.bug.6mT.2017 %>% select(cid, time, School, Month, `Weeks Since Treatment`, Year, mean.eps)
+  kk.bug.6mPostT <- KK.bug.6mT.2017 %>% select(cid, time, School, Month, `Weeks Since Treatment`, Year, mean.eps, SEX)
   kk.bug.6mPostT$event <- "Treated"
   
   KK.bug.6m3wk$time <- "C"
@@ -140,7 +140,7 @@ recent_data <- function(KK.bug.BLT, KK.bug.6mT.2017, KK.bug.6m3wk, KK.bug.6m9wk,
   KK.bug.6m3wk$Year <- "2017"
   KK.bug.6m3wk$School <- "Bugoto"
   KK.bug.6m3wk <- KK.bug.6m3wk %>% rowwise() %>% mutate(mean.eps=mean(c(sm_a, sm_b), na.rm = T))
-  kk.bug.3wkpostT <- KK.bug.6m3wk %>% select(cid, time,  School, Month, `Weeks Since Treatment`, Year, mean.eps)
+  kk.bug.3wkpostT <- KK.bug.6m3wk %>% select(cid, time,  School, Month, `Weeks Since Treatment`, Year, mean.eps, SEX)
   kk.bug.3wkpostT$event <- "Check-up"
   
   KK.bug.6m9wk$time <- "D"
@@ -151,7 +151,7 @@ recent_data <- function(KK.bug.BLT, KK.bug.6mT.2017, KK.bug.6m3wk, KK.bug.6m9wk,
   KK.bug.6m9wk$Month <- "Dec 9wk PT"
   KK.bug.6m9wk$School <- "Bugoto"
   KK.bug.6m9wk <- KK.bug.6m9wk %>% rowwise() %>% mutate(mean.eps=mean(c(sm_a, sm_b), na.rm = T))
-  kk.bug.9wekpostT <- KK.bug.6m9wk %>% select(cid, time,  School, Month, `Weeks Since Treatment`, Year, mean.eps)
+  kk.bug.9wekpostT <- KK.bug.6m9wk %>% select(cid, time,  School, Month, `Weeks Since Treatment`, Year, mean.eps, SEX)
   kk.bug.9wekpostT$event <- "Check-up"
   
   KK.bug.6mT2018$time <- "E"
@@ -162,7 +162,7 @@ recent_data <- function(KK.bug.BLT, KK.bug.6mT.2017, KK.bug.6m3wk, KK.bug.6m9wk,
   KK.bug.6mT2018$Month <- "March 2018"
   KK.bug.6mT2018$School <- "Bugoto"
   KK.bug.6mT2018 <- KK.bug.6mT2018 %>% rowwise() %>% mutate(mean.eps=mean(c(sm_a, sm_b), na.rm = T))
-  kk.bug.6mpT1ypBL <- KK.bug.6mT2018 %>% select(cid, time,  School, Month, `Weeks Since Treatment`, Year, mean.eps)
+  kk.bug.6mpT1ypBL <- KK.bug.6mT2018 %>% select(cid, time,  School, Month, `Weeks Since Treatment`, Year, mean.eps, SEX)
   kk.bug.6mpT1ypBL$event <- "Treated"
   
   KK.bug.6m3wk2018$time <- "F"
@@ -174,7 +174,7 @@ recent_data <- function(KK.bug.BLT, KK.bug.6mT.2017, KK.bug.6m3wk, KK.bug.6m9wk,
   KK.bug.6m3wk2018$School <- "Bugoto"
   KK.bug.6m3wk2018$sm_b <- as.numeric(KK.bug.6m3wk2018$sm_b)
   KK.bug.6m3wk2018 <- KK.bug.6m3wk2018 %>% rowwise() %>% mutate(mean.eps=mean(c(sm_a, sm_b), na.rm = T))
-  kk.bug.6m3wkpT1ypBL <- KK.bug.6m3wk2018 %>% select(cid, time,  School, Month, `Weeks Since Treatment`, Year, mean.eps)
+  kk.bug.6m3wkpT1ypBL <- KK.bug.6m3wk2018 %>% select(cid, time,  School, Month, `Weeks Since Treatment`, Year, mean.eps, SEX)
   kk.bug.6m3wkpT1ypBL$event <- "Check-up"
   # Bwondha 
   
@@ -186,7 +186,7 @@ recent_data <- function(KK.bug.BLT, KK.bug.6mT.2017, KK.bug.6m3wk, KK.bug.6m9wk,
   KK.bwo.BLT$Month <- "Sept 2017"
   KK.bwo.BLT$School <- "Bwondha"
   KK.bwo.BLT <- KK.bwo.BLT %>% rowwise() %>% mutate(mean.eps=mean(c(sm_a, sm_b), na.rm = T))%>% rename(cid=cid_full)
-  kk.bwo.bl <- KK.bwo.BLT %>% select(cid, time,  School, Month, `Weeks Since Treatment`, Year, mean.eps)
+  kk.bwo.bl <- KK.bwo.BLT %>% select(cid, time,  School, Month, `Weeks Since Treatment`, Year, mean.eps, SEX)
   kk.bwo.bl$event <- "Treated"
   
   KK.bwo.4mT$time <- "H"
@@ -197,7 +197,7 @@ recent_data <- function(KK.bug.BLT, KK.bug.6mT.2017, KK.bug.6m3wk, KK.bug.6m9wk,
   KK.bwo.4mT$Month <- "Feb 2018"
   KK.bwo.4mT$School <- "Bwondha"
   KK.bwo.4mT <- KK.bwo.4mT %>% rowwise() %>% mutate(mean.eps=mean(c(sm_a, sm_b), na.rm = T))%>% rename(cid=cid_full)
-  kk.bwo.4mt <- KK.bwo.4mT %>% select(cid, time,  School, Month, `Weeks Since Treatment`, Year, mean.eps)
+  kk.bwo.4mt <- KK.bwo.4mT %>% select(cid, time,  School, Month, `Weeks Since Treatment`, Year, mean.eps, SEX)
   kk.bwo.4mt$event <- "Treated"
   
   KK.bwo.3wk$time <- "I"
@@ -208,7 +208,7 @@ recent_data <- function(KK.bug.BLT, KK.bug.6mT.2017, KK.bug.6m3wk, KK.bug.6m9wk,
   KK.bwo.3wk$Month <- "March 2018"
   KK.bwo.3wk$School <- "Bwondha"
   KK.bwo.3wk <- KK.bwo.3wk %>% rowwise() %>% mutate(mean.eps=mean(c(sm_a, sm_b), na.rm = T))%>% rename(cid=cid_full)
-  kk.bwo.3wkpT <- KK.bwo.3wk %>% select(cid, time,  School, Month, `Weeks Since Treatment`, Year, mean.eps)
+  kk.bwo.3wkpT <- KK.bwo.3wk %>% select(cid, time,  School, Month, `Weeks Since Treatment`, Year, mean.eps, SEX)
   kk.bwo.3wkpT$event <- "Check-up"
   
   # Musubi 
@@ -221,7 +221,7 @@ recent_data <- function(KK.bug.BLT, KK.bug.6mT.2017, KK.bug.6m3wk, KK.bug.6m9wk,
   KK.mus.BLT$Month <- "Sept 2017"
   KK.mus.BLT$School <- "Musubi"
   KK.mus.BLT <- KK.mus.BLT %>% rowwise() %>% mutate(mean.eps=mean(c(sm_a, sm_b), na.rm = T))%>% rename(cid=cid_full)
-  kk.mus.bl <- KK.mus.BLT %>% select(cid, time,  School, Month, `Weeks Since Treatment`, Year, mean.eps)
+  kk.mus.bl <- KK.mus.BLT %>% select(cid, time,  School, Month, `Weeks Since Treatment`, Year, mean.eps, SEX)
   kk.mus.bl$event <- "Treated"
   
   KK.mus.6mT$time <- "K"
@@ -232,7 +232,7 @@ recent_data <- function(KK.bug.BLT, KK.bug.6mT.2017, KK.bug.6m3wk, KK.bug.6m9wk,
   KK.mus.6mT$Month <- "March 2018"
   KK.mus.6mT$School <- "Musubi"
   KK.mus.6mT <- KK.mus.6mT %>% rowwise() %>% mutate(mean.eps=mean(c(sm_a, sm_b), na.rm = T))%>% rename(cid=cid_full)
-  kk.mus.6mpT <- KK.mus.6mT %>% select(cid, time,  School, Month, `Weeks Since Treatment`, Year, mean.eps)
+  kk.mus.6mpT <- KK.mus.6mT %>% select(cid, time,  School, Month, `Weeks Since Treatment`, Year, mean.eps, SEX)
   kk.mus.6mpT$event <- "Treated"
   
   KK.mus.3wk$time <- "L"
@@ -243,7 +243,7 @@ recent_data <- function(KK.bug.BLT, KK.bug.6mT.2017, KK.bug.6m3wk, KK.bug.6m9wk,
   KK.mus.3wk$Year <- "2018"
   KK.mus.3wk$School <- "Musubi"
   KK.mus.3wk <- KK.mus.3wk %>% rowwise() %>% mutate(mean.eps=mean(c(sm_a, sm_b), na.rm = T))%>% rename(cid=cid_full)
-  kk.mus.3wkpT <- KK.mus.3wk %>% select(cid, time, School, Month, `Weeks Since Treatment`, Year, mean.eps)
+  kk.mus.3wkpT <- KK.mus.3wk %>% select(cid, time, School, Month, `Weeks Since Treatment`, Year, mean.eps, SEX)
   kk.mus.3wkpT$event <- "Check-up"
  
   recent.data <- rbind(kk.bug.bl, kk.bug.6mPostT, kk.bug.3wkpostT, kk.bug.9wekpostT, kk.bug.6mpT1ypBL, kk.bug.6m3wkpT1ypBL, kk.bwo.bl, kk.bwo.4mt, kk.bwo.3wkpT, kk.mus.bl,kk.mus.6mpT,kk.mus.3wkpT   )
@@ -282,8 +282,30 @@ err_func <- function(df, meanPreT, meanPostT){
 
 
 
-
-
+# extract age
+age_extraction <- function(dataframe){
+  dataframe$age <- NA
+  dataframe$age[grepl("1706",dataframe$cid)] <- "06"
+  dataframe$age[grepl("1707",dataframe$cid)] <- "07"
+  dataframe$age[grepl("1708",dataframe$cid)] <- "08"
+  dataframe$age[grepl("1709",dataframe$cid)] <- "09"
+  dataframe$age[grepl("1710",dataframe$cid)] <- "10"
+  dataframe$age[grepl("1711",dataframe$cid)] <- "11"
+  dataframe$age[grepl("1712",dataframe$cid)] <- "12"
+  dataframe$age[grepl("1713",dataframe$cid)] <- "13"
+  dataframe$age[grepl("1714",dataframe$cid)] <- "14"
+  dataframe$age[grepl("1806",dataframe$cid)] <- "06"
+  dataframe$age[grepl("1807",dataframe$cid)] <- "07"
+  dataframe$age[grepl("1808",dataframe$cid)] <- "08"
+  dataframe$age[grepl("1809",dataframe$cid)] <- "09"
+  dataframe$age[grepl("1810",dataframe$cid)] <- "10"
+  dataframe$age[grepl("1811",dataframe$cid)] <- "11"
+  dataframe$age[grepl("1812",dataframe$cid)] <- "12"
+  dataframe$age[grepl("1813",dataframe$cid)] <- "13"
+  dataframe$age[grepl("1814",dataframe$cid)] <- "14"
+  dataframe$age <- as.factor(dataframe$age)
+  return(dataframe)
+}
 
 
 
